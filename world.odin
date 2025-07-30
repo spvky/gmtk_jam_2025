@@ -1,9 +1,9 @@
 package main
 
-import rl "vendor:raylib"
-
-World :: struct {}
+World :: struct {
+	first_loop: bool
+}
 
 make_world :: proc() -> World {
-	return World{}
+	return World{ first_loop = true}
 }

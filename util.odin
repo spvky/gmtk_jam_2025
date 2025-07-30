@@ -4,7 +4,7 @@ import "core:strings"
 import rl "vendor:raylib"
 import "utils"
 
-Vec3 :: [3]f32
+Vec2 :: [2]f32
 
 load_texture :: proc(filename: string) -> rl.Texture {
 	when ODIN_OS == .JS {

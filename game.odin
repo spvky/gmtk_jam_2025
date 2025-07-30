@@ -1,6 +1,7 @@
 package main
 
 import "core:c"
+import "core:fmt"
 import rl "vendor:raylib"
 
 world: World
@@ -12,7 +13,6 @@ WINDOW_HEIGHT: i32
 SCREEN_WIDTH :: 800
 SCREEN_HEIGHT :: 450
 
-
 init :: proc() {
 	WINDOW_WIDTH = 1600
 	WINDOW_HEIGHT = 900
@@ -20,6 +20,7 @@ init :: proc() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
 	screen_texture = rl.LoadRenderTexture(SCREEN_HEIGHT, SCREEN_HEIGHT)
 	world = make_world()
+	fmt.printfln("Size of InputStream: %v", size_of(InputStream))
 }
 
 update :: proc() {
