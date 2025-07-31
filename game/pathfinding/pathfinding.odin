@@ -97,3 +97,19 @@ generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]rl.Vector2
 
 	return flow_field
 }
+
+// TODO deprecate so we can remove raylib import
+debug_draw :: proc(flow_field: [][]rl.Vector2, tile_size: int) {
+	for y in 0 ..< len(flow_field) {
+		for x in 0 ..< len(flow_field[0]) {
+			value := flow_field[y][x]
+			rl.DrawText(
+				rl.TextFormat("%d %d", i32(value.x), i32(value.y)),
+				i32(x * tile_size),
+				i32(y * tile_size),
+				5,
+				rl.RED,
+			)
+		}
+	}
+}
