@@ -33,5 +33,5 @@ set_player_velocities :: proc() {
 }
 
 apply_player_velocities :: proc() {
-	world.player.translation += world.player.velocity
+	world.player.translation += world.player.velocity * TICK_RATE
 }

@@ -10,6 +10,7 @@ world: World
 screen_texture: rl.RenderTexture
 input_streams: [dynamic]InputStream
 
+TICK_RATE :: 1.0 / 100.0
 WINDOW_WIDTH: i32
 WINDOW_HEIGHT: i32
 SCREEN_WIDTH :: 800
@@ -51,21 +52,36 @@ draw :: proc() {
 update :: proc() {
 	switch world.game_state {
 	case .Playing:
-		// Gameplay Code
-		read_input()
-		if rl.IsKeyPressed(.R) {
-			reset_loop()
-		}
-
-		write_input_to_stream()
-		physics_step()
-		world.current_tick += 1
-
+		playing()
 	case .Paused:
 	case .MainMenu:
 	case .Looping:
 	}
 	//Visual Updates
+}
+
+// Gameplay Code
+playing :: proc() {
+	if !world.loop_timer_started {
+		world.loop_time = f32(rl.GetTime())
+		world.loop_timer_started = true
+	}
+
+	read_input()
+	t1 := f32(rl.GetTime())
+	elapsed := math.min(t1 - world.loop_time, 0.25)
+	world.loop_time = t1
+	world.simulation_time += elapsed
+	for world.simulation_time >= TICK_RATE {
+		write_input_to_stream()
+		physics_step()
+		world.current_tick += 1
+		world.simulation_time -= TICK_RATE
+	}
+
+	if rl.IsKeyPressed(.R) {
+		reset_loop()
+	}
 }
 
 shutdown :: proc() {
