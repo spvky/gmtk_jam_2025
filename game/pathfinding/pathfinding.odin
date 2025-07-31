@@ -3,6 +3,7 @@ package pathfinding
 import "core:container/queue"
 import "core:math"
 import l "core:math/linalg"
+import rl "vendor:raylib"
 
 Vec2 :: [2]f32
 IVec :: [2]int
@@ -105,8 +106,7 @@ generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]Vec2 {
 	return flow_field
 }
 
-// TODO deprecate so we can remove raylib import
-debug_draw :: proc(flow_field: [][]rl.Vector2, tile_size: int) {
+debug_draw :: proc(flow_field: [][]Vec2, tile_size: int) {
 	for y in 0 ..< len(flow_field) {
 		for x in 0 ..< len(flow_field[0]) {
 			value := flow_field[y][x]
