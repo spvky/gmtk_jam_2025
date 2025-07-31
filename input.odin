@@ -108,7 +108,7 @@ read_input :: proc() {
 }
 
 write_input_to_stream :: proc() {
-	input_streams[world.loop_number][world.current_tick] = world.current_input_tick
+	input_streams[0][world.current_tick] = world.current_input_tick
 }
 
 make_input_streams :: proc() -> [dynamic]InputStream {

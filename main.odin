@@ -1,5 +1,8 @@
 package main
 
+import "core:fmt"
+import "core:mem"
+
 
 main :: proc() {
 	when ODIN_OS != .JS && ODIN_DEBUG {

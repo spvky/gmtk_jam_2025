@@ -1,5 +1,7 @@
 package main
 
+import "core:fmt"
+
 reset_loop :: proc() {
 	world.current_tick = 0
 	world.loop_number += 1
@@ -14,12 +16,20 @@ reset_loop :: proc() {
 start_new_loop :: proc() {
 	inject_at_elem(&input_streams, 0, InputStream{})
 	clear(&world.players)
-	for i in 0 ..< world.loop_number {
+	for i in 0 ..= world.loop_number {
 		if i == 0 {
 			append(&world.players, make_player(.Player))
 		} else {
 			append(&world.players, make_player(.Ghost))
 		}
+	}
+	when ODIN_DEBUG {
+		fmt.printfln(
+			"Starting new loop: %v\nPlayers: %v\nInput Streams: %v",
+			world.current_tick,
+			len(world.players),
+			len(input_streams),
+		)
 	}
 	world.game_state = .Playing
 }
