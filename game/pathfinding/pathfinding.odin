@@ -3,14 +3,9 @@ package pathfinding
 import "core:container/queue"
 import "core:math"
 import l "core:math/linalg"
-import rl "vendor:raylib"
 
 Vec2 :: [2]f32
 IVec :: [2]int
-
-// could simplify
-// - can make alias for [2]int
-// - avoid pulling in raylib here, it's just for vector math
 
 Cell :: struct {
 	walkable: bool,
@@ -102,19 +97,4 @@ generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]Vec2 {
 	}
 
 	return flow_field
-}
-
-debug_draw :: proc(flow_field: [][]Vec2, tile_size: int) {
-	for y in 0 ..< len(flow_field) {
-		for x in 0 ..< len(flow_field[0]) {
-			value := flow_field[y][x]
-			rl.DrawText(
-				rl.TextFormat("%d %d", i32(value.x), i32(value.y)),
-				i32(x * tile_size),
-				i32(y * tile_size),
-				5,
-				rl.RED,
-			)
-		}
-	}
 }

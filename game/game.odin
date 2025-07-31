@@ -41,7 +41,7 @@ init :: proc() {
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
 		world.levels = get_all_levels(project)
-		world.current_level = .Level
+		world.current_level = .Hub
 	}
 	rl.SetTargetFPS(60)
 
@@ -54,7 +54,7 @@ draw :: proc() {
 	rl.ClearBackground(rl.BLACK)
 	render_players()
 	display_clock()
-	draw_tiles(world.levels[0], tilesheet)
+	draw_tiles(world.levels[world.current_level], tilesheet)
 	// temporary debug drawing
 	rl.DrawTextureEx(
 		bullet,
@@ -63,8 +63,6 @@ draw :: proc() {
 		3,
 		rl.WHITE,
 	)
-
-	pathfinding.debug_draw(flow_field, 16)
 	rl.EndTextureMode()
 
 
@@ -94,6 +92,7 @@ update :: proc() {
 
 // Gameplay Code
 playing :: proc() {
+	level: Level = world.levels[world.current_level]
 	if !world.loop_timer_started {
 		world.loop_time = f32(rl.GetTime())
 		world.loop_timer_started = true
@@ -121,11 +120,12 @@ playing :: proc() {
 
 	// these can be update technically only when moving, if we want to limit the calls
 	// or / also at only certain intervals if we want
-	cells := world.levels[0].cell_grid
+	cells := level.cell_grid
 
-	grid_position := world.player.translation / 16
+	grid_position := (world.player.translation - level.position) / TILE_SIZE
 	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
+
 }
 
 shutdown :: proc() {
