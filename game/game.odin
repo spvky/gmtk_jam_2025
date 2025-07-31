@@ -3,7 +3,9 @@ package game
 import ldtk "../ldtk"
 import "../utils"
 import "core:c"
+import "core:fmt"
 import "core:math"
+import "pathfinding"
 import rl "vendor:raylib"
 
 Vec2 :: rl.Vector2
@@ -23,6 +25,10 @@ run := true
 bullet: rl.Texture
 
 tilesheet: rl.Texture
+
+// TODO move somewhere sensible
+cost_map: [][]int
+flow_field: [][]rl.Vector2
 
 init :: proc() {
 	WINDOW_WIDTH = 1600
@@ -57,6 +63,8 @@ draw :: proc() {
 		3,
 		rl.WHITE,
 	)
+
+	pathfinding.debug_draw(flow_field, 16)
 	rl.EndTextureMode()
 
 
@@ -110,6 +118,14 @@ playing :: proc() {
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
 	update_camera_position(target_position)
+
+	// these can be update technically only when moving, if we want to limit the calls
+	// or / also at only certain intervals if we want
+	cells := world.levels[0].cell_grid
+
+	grid_position := world.player.translation / 16
+	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
+	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 }
 
 shutdown :: proc() {
