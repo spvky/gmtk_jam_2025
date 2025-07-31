@@ -17,21 +17,16 @@ Cell :: struct {
 	cost:     int,
 }
 
-directions := [4]IVec{
-	{0, 1},
-	{1, 0},
-	{0, -1},
-	{-1, 0}
-}
+directions := [4]IVec{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 
 
 generate_cost_map :: proc(grid: [][]Cell, target: IVec) -> [][]int {
 	height := len(grid)
 	width := len(grid[0])
 
-	cost_map := make([][]int, height)
+	cost_map := make([][]int, height, allocator = context.temp_allocator)
 	for y in 0 ..< height {
-		cost_map[y] = make([]int, width)
+		cost_map[y] = make([]int, width, allocator = context.temp_allocator)
 		for x in 0 ..< width {
 			cost_map[y][x] = 1000
 		}
@@ -73,9 +68,12 @@ generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]Vec2 {
 	height := len(cost_map)
 	width := len(cost_map[0])
 
-	flow_field := make([][]Vec2, height)
+	// we might not want the lifetime of this to only be one frame
+	// but we can keep it like this for now and be more conservative with pathfinding updates
+	// if we notice it's performance being influenced
+	flow_field := make([][]Vec2, height, allocator = context.temp_allocator)
 	for y in 0 ..< height {
-		flow_field[y] = make([]Vec2, width)
+		flow_field[y] = make([]Vec2, width, allocator = context.temp_allocator)
 	}
 
 
