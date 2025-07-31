@@ -21,7 +21,7 @@ init :: proc() {
 	WINDOW_WIDTH = 1600
 	WINDOW_HEIGHT = 900
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
-	screen_texture = rl.LoadRenderTexture(SCREEN_HEIGHT, SCREEN_HEIGHT)
+	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	world = make_world()
 	input_streams = make_input_streams()
 
