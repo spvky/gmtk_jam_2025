@@ -1,5 +1,6 @@
 package game
 
+import "core:math"
 import rl "vendor:raylib"
 
 
@@ -47,8 +48,9 @@ InputStream :: [10_000]InputTick
 
 
 InputTick :: struct {
-	direction: Direction,
-	buttons:   bit_set[Button],
+	direction:      Direction,
+	buttons:        bit_set[Button],
+	mouse_rotation: f32,
 }
 
 InputMode :: enum {
@@ -56,7 +58,19 @@ InputMode :: enum {
 	Playback,
 }
 
-read_input :: proc() {
+get_mouse_rotation :: proc(relative_position: rl.Vector2) -> f32 {
+	normalized_mouse_position := rl.GetMousePosition() / {f32(WINDOW_WIDTH), f32(WINDOW_HEIGHT)}
+
+	screen_space_mouse_position := normalized_mouse_position * {SCREEN_WIDTH, SCREEN_HEIGHT}
+
+	offset := screen_space_mouse_position - relative_position
+
+	return math.atan2(offset.y, offset.x)
+
+}
+
+
+read_input :: proc(mouse_rotation: f32) {
 	x, y: i8
 	direction := Direction.Neutral
 	if rl.IsKeyDown(.A) {
@@ -101,8 +115,9 @@ read_input :: proc() {
 	}
 
 	world.current_input_tick = InputTick {
-		direction = direction,
-		buttons   = buttons,
+		direction      = direction,
+		buttons        = buttons,
+		mouse_rotation = mouse_rotation,
 	}
 
 }
