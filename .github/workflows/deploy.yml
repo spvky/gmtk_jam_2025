@@ -2,7 +2,7 @@ name: Deploy to game to web
 
 on:
   push:
-    branches: [web_build, master]
+    branches: [main]
 
 env:
   EM_CACHE_FOLDER: 'emsdk_cache'  # Custom cache directory name
