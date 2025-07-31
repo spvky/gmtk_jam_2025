@@ -18,7 +18,7 @@ start_new_loop :: proc() {
 		fmt.printfln(
 			"Starting new loop: %v\nPlayers: %v\nInput Streams: %v",
 			world.current_tick,
-			len(world.players),
+			len(world.player),
 			len(input_streams),
 		)
 	}

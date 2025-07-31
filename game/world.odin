@@ -5,7 +5,7 @@ World :: struct {
 	current_tick:       u16,
 	game_state:         GameState,
 	current_input_tick: InputTick,
-	players:            Player,
+	player:             Player,
 }
 
 GameState :: enum {

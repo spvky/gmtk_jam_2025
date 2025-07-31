@@ -19,23 +19,19 @@ make_player :: proc(tag: PlayerTag) -> Player {
 }
 
 render_players :: proc() {
-	player := world.players
+	player := world.player
 	color := player.tag == .Player ? rl.BLUE : rl.WHITE
-	rl.DrawCircleV(player.translation, player.radius, color)
+	rl.DrawCircleV(player.translation, 20, color)
 }
 
 set_player_velocities :: proc() {
-	return
-	/*
-	player :: world.players;
-	for &player, i in world.players {
-		input := input_streams[i][world.current_tick]
-		new_velo := direction_to_vec(input.direction)
-		player.velocity = new_velo * 50
-	}
-	*/
+	player := &world.player
+	input := world.current_input_tick
+	new_velo := direction_to_vec(input.direction)
+
+	player.velocity = new_velo * 50
 }
 
 apply_player_velocities :: proc() {
-	world.players.translation += world.players.velocity * TICK_RATE
+	world.player.translation += world.player.velocity
 }

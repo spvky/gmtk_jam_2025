@@ -10,7 +10,6 @@ world: World
 screen_texture: rl.RenderTexture
 input_streams: [dynamic]InputStream
 
-TICK_RATE :: 1.0 / 100.0
 WINDOW_WIDTH: i32
 WINDOW_HEIGHT: i32
 SCREEN_WIDTH :: 800
@@ -24,6 +23,8 @@ init :: proc() {
 	screen_texture = rl.LoadRenderTexture(SCREEN_HEIGHT, SCREEN_HEIGHT)
 	world = make_world()
 	input_streams = make_input_streams()
+
+	rl.SetTargetFPS(60)
 }
 
 
@@ -55,6 +56,11 @@ update :: proc() {
 		if rl.IsKeyPressed(.R) {
 			reset_loop()
 		}
+
+		write_input_to_stream()
+		physics_step()
+		world.current_tick += 1
+
 	case .Paused:
 	case .MainMenu:
 	case .Looping:
