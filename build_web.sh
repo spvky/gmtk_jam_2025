@@ -2,7 +2,7 @@
 
 # Point this to where you installed emscripten. Optional on systems that already
 # have `emcc` in the path.
-EMSCRIPTEN_SDK_DIR="$HOME/tools/emsdk"
+EMSCRIPTEN_SDK_DIR="$HOME/emsdk"
 OUT_DIR="dist/web"
 
 mkdir -p $OUT_DIR
@@ -17,7 +17,7 @@ export EMSDK_QUIET=1
 # up in env.o
 #
 # Note that there is a rayGUI equivalent: -define:RAYGUI_WASM_LIB=env.o
-odin build web/ -target:js_wasm32 -build-mode:obj -define:RAYLIB_WASM_LIB=env.o -define:RAYGUI_WASM_LIB=env.o -vet -strict-style -out:$OUT_DIR/game.o
+odin build web/ -target:js_wasm32 -build-mode:obj -define:RAYLIB_WASM_LIB=env.o -define:RAYGUI_WASM_LIB=env.o -out:$OUT_DIR/game.o
 
 ODIN_PATH=$(odin root)
 
