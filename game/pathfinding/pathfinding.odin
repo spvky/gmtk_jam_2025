@@ -2,8 +2,10 @@ package pathfinding
 
 import "core:container/queue"
 import "core:math"
+import l "core:math/linalg"
 
-import rl "vendor:raylib"
+Vec2 :: [2]f32
+IVec :: [2]int
 
 // could simplify
 // - can make alias for [2]int
@@ -14,10 +16,15 @@ Cell :: struct {
 	cost:     int,
 }
 
-directions := [4][2]int{[2]int{0, 1}, [2]int{1, 0}, [2]int{0, -1}, [2]int{-1, 0}}
+directions := [4]IVec{
+	{0, 1},
+	{1, 0},
+	{0, -1},
+	{-1, 0}
+}
 
 
-generate_cost_map :: proc(grid: [][]Cell, target: [2]int) -> [][]int {
+generate_cost_map :: proc(grid: [][]Cell, target: IVec) -> [][]int {
 	height := len(grid)
 	width := len(grid[0])
 
@@ -42,7 +49,7 @@ generate_cost_map :: proc(grid: [][]Cell, target: [2]int) -> [][]int {
 		current_cost := cost_map[current.y][current.x]
 
 		for dir in directions {
-			neighbor := [2]int{current.x + dir.x, current.y + dir.y}
+			neighbor := IVec{current.x + dir.x, current.y + dir.y}
 			if neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= width || neighbor.y >= height {
 				continue
 			}
@@ -61,20 +68,20 @@ generate_cost_map :: proc(grid: [][]Cell, target: [2]int) -> [][]int {
 	return cost_map
 }
 
-generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]rl.Vector2 {
+generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]Vec2 {
 	height := len(cost_map)
 	width := len(cost_map[0])
 
-	flow_field := make([][]rl.Vector2, height)
+	flow_field := make([][]Vec2, height)
 	for y in 0 ..< height {
-		flow_field[y] = make([]rl.Vector2, width)
+		flow_field[y] = make([]Vec2, width)
 	}
 
 
 	for y in 0 ..< height {
 		for x in 0 ..< width {
 			best_cost := cost_map[y][x]
-			best_dir: rl.Vector2 = {0, 0}
+			best_dir := Vec2{0, 0}
 
 			for dir in directions {
 				nx := x + dir.x
@@ -87,7 +94,7 @@ generate_flow_field :: proc(cost_map: [][]int, grid: [][]Cell) -> [][]rl.Vector2
 				neighbor_cost := cost_map[ny][nx]
 				if neighbor_cost < best_cost {
 					best_cost = neighbor_cost
-					best_dir = rl.Vector2Normalize({f32(dir.x), f32(dir.y)})
+					best_dir = l.normalize(Vec2{f32(dir.x), f32(dir.y)})
 				}
 			}
 
