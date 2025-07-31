@@ -1,1 +1,3 @@
-dist/
+dist/*
+dist
+gmtk_jam_2025
