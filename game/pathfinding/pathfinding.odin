@@ -12,7 +12,7 @@ Cell :: struct {
 	cost:     int,
 }
 
-directions := [4]IVec{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+directions := [8]IVec{{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1}}
 
 
 generate_cost_map :: proc(grid: [][]Cell, target: IVec) -> [][]int {
