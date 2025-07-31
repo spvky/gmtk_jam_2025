@@ -1,0 +1,65 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [web_build, master]
+
+env:
+  EM_CACHE_FOLDER: 'emsdk_cache'  # Custom cache directory name
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Emscripten
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.EM_CACHE_FOLDER }}
+          key: emsdk-${{ runner.os }}-latest
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+          update: true  # Refresh package info for 'latest'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            wayland-protocols \
+            libwayland-dev \
+            libx11-dev \
+            libxcursor-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxi-dev \
+            mesa-common-dev \
+            cmake \
+            ninja-build
+
+      - name: Setup Odin
+        uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: dev-2025-07
+      - name: Build Game
+        run: |
+          ./web_build.sh
+
+      - name: Prepare Deployment
+        run: |
+          mkdir -p public
+          cp -r build/web/* public/
+          ls public/
+          # Ensure main HTML is named index.html
+          [ -f public/index.html ] || mv public/*.html public/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
