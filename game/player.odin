@@ -34,7 +34,7 @@ make_player :: proc(tag: PlayerTag) -> Player {
 
 render_players :: proc() {
 	player := world.player
-	color := player.tag == .Player ? rl.BLUE : rl.WHITE
+	color := rl.BLUE
 
 	relative_position := get_relative_position(player.translation)
 	rl.DrawCircleV(relative_position, 20, color)
