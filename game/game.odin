@@ -21,6 +21,9 @@ SCREEN_WIDTH :: 800
 SCREEN_HEIGHT :: 450
 run := true
 
+//temp enemy
+enemy: Enemy
+
 // temporary debug access
 bullet: rl.Texture
 
@@ -37,6 +40,8 @@ init :: proc() {
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	world = make_world()
 	input_streams = make_input_streams()
+
+	enemy.position = {250, 200}
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
@@ -63,6 +68,7 @@ draw :: proc() {
 		3,
 		rl.WHITE,
 	)
+	draw_enemy(enemy)
 	rl.EndTextureMode()
 
 
@@ -126,6 +132,7 @@ playing :: proc() {
 	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
+	update_enemy(flow_field, &enemy)
 }
 
 shutdown :: proc() {
