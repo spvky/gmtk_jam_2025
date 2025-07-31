@@ -89,7 +89,7 @@ update :: proc() {
 	case .MainMenu:
 	case .Looping:
 	}
-	//Visual Updates
+	free_all(context.temp_allocator)
 }
 
 // Gameplay Code
