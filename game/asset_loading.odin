@@ -2,13 +2,10 @@ package game
 
 import rl "vendor:raylib"
 
-texture_atlas: [TextureType]rl.Texture
+enemy_texture_atlas: [EnemyTag]rl.Texture
 
-TextureType :: enum {
-	Skeleton,
-}
-
-make_texture_atlas :: proc() -> [TextureType]rl.Texture {
+make_enemy_texture_atlas :: proc() -> [EnemyTag]rl.Texture {
 	skeleton := rl.LoadTexture("assets/sprites/skeleton1.png")
-	return [TextureType]rl.Texture{.Skeleton = skeleton}
+	vampire := rl.LoadTexture("assets/sprites/vampire.png")
+	return [EnemyTag]rl.Texture{.Skeleton = skeleton, .Vampire = vampire}
 }

@@ -11,6 +11,7 @@ Enemy :: struct {
 
 EnemyTag :: enum {
 	Skeleton,
+	Vampire,
 }
 
 EnemyState :: enum {
@@ -23,28 +24,51 @@ EnemyState :: enum {
 make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 	enemy: Enemy
 
-
-	switch tag {
-	case .Skeleton:
-		enemy = {
-			tag = .Skeleton,
-			animation_player = AnimationPlayer {
-				frame_length = 0.1,
-				texture = &texture_atlas[.Skeleton],
-				current_animation = skeleton_animations[.Idle],
-				current_frame = skeleton_animations[.Idle].start,
-			},
-			position = position,
-		}
+	return Enemy {
+		tag = tag,
+		animation_player = AnimationPlayer {
+			frame_length = 0.1,
+			texture = &enemy_texture_atlas[tag],
+			current_animation = enemy_animations[tag][.Idle],
+			current_frame = enemy_animations[tag][.Idle].start,
+		},
+		position = position,
 	}
-	return enemy
+
+	// 	switch tag {
+	// 	case .Skeleton:
+	// 		enemy = {
+	// 			tag = .Skeleton,
+	// 			animation_player = AnimationPlayer {
+	// 				frame_length = 0.1,
+	// 				texture = &texture_atlas[.Skeleton],
+	// 				current_animation = skeleton_animations[.Idle],
+	// 				current_frame = skeleton_animations[.Idle].start,
+	// 			},
+	// 			position = position,
+	// 		}
+	// 	case .Vampire:
+	// 		enemy = {
+	// 			tag = .Vampire,
+	// 			animation_player = AnimationPlayer {
+	// 				frame_length = 0.1,
+	// 				texture = &texture_atlas[.Vampire],
+	// 				current_animation = skeleton_animations[.Idle],
+	// 				current_frame = skeleton_animations[.Idle].start,
+	// 			},
+	// 			position = position,
+	// 		}
+	// 	}
+	// 	return enemy
 }
 
-update_enemy :: proc(flow_field: [][]rl.Vector2, enemy: ^Enemy) {
-	grid_position := (enemy.position / TILE_SIZE)
-	direction := flow_field[int(grid_position.y)][int(grid_position.x)]
-	enemy.position += direction
-	animate_enemy(enemy)
+update_enemies :: proc(flow_field: [][]rl.Vector2) {
+	for &enemy in enemies {
+		grid_position := (enemy.position / TILE_SIZE)
+		direction := flow_field[int(grid_position.y)][int(grid_position.x)]
+		enemy.position += direction
+		animate_enemy(&enemy)
+	}
 }
 
 animate_enemy :: proc(enemy: ^Enemy) {
@@ -62,19 +86,18 @@ animate_enemy :: proc(enemy: ^Enemy) {
 	}
 }
 
-draw_enemy :: proc(enemy: Enemy) {
-	// rl.DrawCircleV(get_relative_position(enemy.position), 8, rl.RED)
-	relative_position := get_relative_position(enemy.position)
-	current_frame := enemy.animation_player.current_frame
-	// current_frame := 0
-	x_position := f32(current_frame % 9) * 32
-	y_position := f32(current_frame / 9) * 32
-	source_rect := rl.Rectangle {
-		x      = x_position,
-		y      = y_position,
-		width  = 32,
-		height = 32,
+draw_enemies :: proc() {
+	for enemy in enemies {
+		relative_position := get_relative_position(enemy.position)
+		current_frame := enemy.animation_player.current_frame
+		x_position := f32(current_frame % 9) * 32
+		y_position := f32(current_frame / 9) * 32
+		source_rect := rl.Rectangle {
+			x      = x_position,
+			y      = y_position,
+			width  = 32,
+			height = 32,
+		}
+		rl.DrawTextureRec(enemy.animation_player.texture^, source_rect, relative_position, rl.WHITE)
 	}
-	fmt.printfln("Source: %v", source_rect)
-	rl.DrawTextureRec(enemy.animation_player.texture^, source_rect, relative_position, rl.WHITE)
 }

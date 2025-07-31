@@ -22,7 +22,7 @@ SCREEN_HEIGHT :: 450
 run := true
 
 //temp enemy
-enemy: Enemy
+enemies: [dynamic]Enemy
 
 // temporary debug access
 bullet: rl.Texture
@@ -39,9 +39,11 @@ init :: proc() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	world = make_world()
-	texture_atlas = make_texture_atlas()
+	enemy_texture_atlas = make_enemy_texture_atlas()
 	input_streams = make_input_streams()
-	enemy = make_enemy(.Skeleton, {250, 200})
+	enemies = make([dynamic]Enemy, 0, 32)
+	append(&enemies, make_enemy(.Skeleton, {250, 200}))
+	append(&enemies, make_enemy(.Vampire, {450, 200}))
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
@@ -68,7 +70,7 @@ draw :: proc() {
 		3,
 		rl.WHITE,
 	)
-	draw_enemy(enemy)
+	draw_enemies()
 	rl.EndTextureMode()
 
 
@@ -132,7 +134,7 @@ playing :: proc() {
 	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
-	update_enemy(flow_field, &enemy)
+	update_enemies(flow_field)
 }
 
 shutdown :: proc() {
