@@ -11,7 +11,7 @@
 	"iid": "de6c4050-5e50-11f0-9a6e-d3884b8ae312",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 163,
+	"nextUid": 164,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -565,8 +565,8 @@
 			"spacing": 0,
 			"padding": 0,
 			"tags": [],
-			"tagsSourceEnumUid": null,
-			"enumTags": [],
+			"tagsSourceEnumUid": 163,
+			"enumTags": [{ "enumValueId": "Collision", "tileIds": [0,1,2,3,4,5,10,15,20,25,30,35,40,41,42,43,44,45,50,51,52,53,54,55] }],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
@@ -574,7 +574,7 @@
 				"averageColors": "f433f534f534f534f534f433f423f423f423f423f433f323f323f323f323f433f423f423f423f423f433f323f423f423f323f433f423f423f423f423f433f323f323f323f323f433f755f755f666d644f322f433f433f433f433f3225644564456448433f534f433f433f534f534f5345644564456444433f323f323f323f32367762775e755e7653654f644f423f423f423f4238975267736674765f211f4236643676787778643977757674b96389a367749884855385427554776367747663677489a39883975"
 			}
 		}
-	], "enums": [], "externalEnums": [], "levelFields": [] },
+	], "enums": [{ "identifier": "TileEnum", "uid": 163, "values": [{ "id": "Collision", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
 			"identifier": "Level_0",
