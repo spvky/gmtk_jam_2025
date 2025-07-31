@@ -4,8 +4,8 @@ import rl "vendor:raylib"
 
 
 Button :: enum u8 {
-	Action,
-	Hands,
+	Shoot,
+	Roll,
 }
 
 Direction :: enum u8 {
@@ -43,7 +43,7 @@ direction_to_vec :: proc(dir: Direction) -> Vec2 {
 	return vec
 }
 
-InputStream :: [30_000]InputTick
+InputStream :: [10_000]InputTick
 
 
 InputTick :: struct {
@@ -94,10 +94,10 @@ read_input :: proc() {
 	buttons: bit_set[Button]
 
 	if rl.IsKeyDown(.SPACE) {
-		buttons = buttons | {.Action}
+		buttons = buttons | {.Shoot}
 	}
 	if rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT) {
-		buttons = buttons | {.Hands}
+		buttons = buttons | {.Roll}
 	}
 
 	world.current_input_tick = InputTick {

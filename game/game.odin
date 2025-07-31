@@ -33,6 +33,7 @@ draw :: proc() {
 	rl.BeginTextureMode(screen_texture)
 	rl.ClearBackground(rl.BLACK)
 	render_players()
+	display_clock()
 	rl.EndTextureMode()
 
 
