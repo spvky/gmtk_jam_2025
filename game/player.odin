@@ -1,4 +1,4 @@
-package main
+package game
 
 import rl "vendor:raylib"
 
@@ -19,22 +19,23 @@ make_player :: proc(tag: PlayerTag) -> Player {
 }
 
 render_players :: proc() {
-	for player in world.players {
-		color := player.tag == .Player ? rl.BLUE : rl.WHITE
-		rl.DrawCircleV(player.translation, player.radius, color)
-	}
+	player := world.players
+	color := player.tag == .Player ? rl.BLUE : rl.WHITE
+	rl.DrawCircleV(player.translation, player.radius, color)
 }
 
 set_player_velocities :: proc() {
+	return
+	/*
+	player :: world.players;
 	for &player, i in world.players {
 		input := input_streams[i][world.current_tick]
 		new_velo := direction_to_vec(input.direction)
 		player.velocity = new_velo * 50
 	}
+	*/
 }
 
 apply_player_velocities :: proc() {
-	for &player in world.players {
-		player.translation += player.velocity * TICK_RATE
-	}
+	world.players.translation += world.players.velocity * TICK_RATE
 }

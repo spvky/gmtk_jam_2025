@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import "core:mem"
+import "game"
 
 
 main :: proc() {
@@ -19,9 +20,10 @@ main :: proc() {
 			mem.tracking_allocator_destroy(&track)
 		}
 	}
-	init()
-	for should_run() {
-		update()
+	game.init()
+	for game.should_run() {
+		game.update()
+		game.draw()
 	}
-	shutdown()
+	game.shutdown()
 }
