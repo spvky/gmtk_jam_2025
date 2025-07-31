@@ -39,9 +39,9 @@ init :: proc() {
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	world = make_world()
+	texture_atlas = make_texture_atlas()
 	input_streams = make_input_streams()
-
-	enemy.position = {250, 200}
+	enemy = make_enemy(.Skeleton, {250, 200})
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {

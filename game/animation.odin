@@ -2,18 +2,12 @@ package game
 
 import rl "vendor:raylib"
 
-skeleton_animations := [SkeletonAnimation]Animation {
-	.Idle = {start = 0, end = 5},
-	.Movement = {start = 6, end = 15},
-	.Attack = {start = 18, end = 26},
-	.Die = {start = 27, end = 43},
-}
-
 AnimationPlayer :: struct {
-	frame_length:      f32,
-	texture:           ^rl.Texture,
-	current_animation: Animation,
-	current_index:     int,
+	frame_length:          f32,
+	texture:               ^rl.Texture,
+	current_animation:     Animation,
+	current_frame:         int,
+	animation_progression: f32,
 }
 
 Animation :: struct {
@@ -21,12 +15,13 @@ Animation :: struct {
 	end:   int,
 }
 
-// Skeleton
-SkeletonAnimation :: enum {
-	Idle,
-	Movement,
-	Attack,
-	Die,
+skeleton_animations := [EnemyState]Animation {
+	.Idle = {start = 0, end = 5},
+	.Movement = {start = 6, end = 15},
+	.Attack = {start = 18, end = 26},
+	.Die = {start = 27, end = 43},
 }
 
-animate_enemies :: proc()
+animate_enemies :: proc() {
+
+}
