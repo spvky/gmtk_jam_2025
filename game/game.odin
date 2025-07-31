@@ -1,5 +1,6 @@
 package game
 
+import "../utils"
 import "core:c"
 import "core:math"
 import rl "vendor:raylib"
@@ -17,6 +18,9 @@ SCREEN_WIDTH :: 800
 SCREEN_HEIGHT :: 450
 run := true
 
+// temporary debug access
+bullet: rl.Texture
+
 init :: proc() {
 	WINDOW_WIDTH = 1600
 	WINDOW_HEIGHT = 900
@@ -26,6 +30,8 @@ init :: proc() {
 	input_streams = make_input_streams()
 
 	rl.SetTargetFPS(60)
+
+	bullet = utils.load_texture("./assets/bullet.png")
 }
 
 
@@ -34,6 +40,14 @@ draw :: proc() {
 	rl.ClearBackground(rl.BLACK)
 	render_players()
 	display_clock()
+	// temporary debug drawing
+	rl.DrawTextureEx(
+		bullet,
+		get_relative_position(world.player.translation),
+		world.current_input_tick.mouse_rotation * math.DEG_PER_RAD,
+		3,
+		rl.WHITE,
+	)
 	rl.EndTextureMode()
 
 
@@ -68,7 +82,8 @@ playing :: proc() {
 		world.loop_timer_started = true
 	}
 
-	read_input()
+	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
+	read_input(relative_mouse_rotation)
 	t1 := f32(rl.GetTime())
 	elapsed := math.min(t1 - world.loop_time, 0.25)
 	world.loop_time = t1
@@ -83,6 +98,9 @@ playing :: proc() {
 	if rl.IsKeyPressed(.R) {
 		reset_loop()
 	}
+
+	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
+	update_camera_position(target_position)
 }
 
 shutdown :: proc() {
