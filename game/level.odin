@@ -1,16 +1,21 @@
 package game
 
 import ldtk "../ldtk"
+import "core:fmt"
+import "pathfinding"
 import rl "vendor:raylib"
 
 TILE_SIZE :: 16
 
 Level :: struct {
-	tiles:    [dynamic]Tile,
-	width:    int,
-	height:   int,
-	position: rl.Vector2,
-	entities: [dynamic]Entity,
+	tiles:     [dynamic]Tile,
+	width:     int,
+	height:    int,
+	position:  rl.Vector2,
+	entities:  [dynamic]Entity,
+
+	// for pathfinding
+	cell_grid: [][]pathfinding.Cell,
 }
 
 Level_Enum :: enum {
@@ -45,9 +50,10 @@ get_all_levels :: proc(project: ldtk.Project) -> [dynamic]Level {
 
 	levels: [dynamic]Level
 
-	for level in project.levels {
-
-		append(&levels, load_level(level, project.defs.tilesets[0]))
+	for ldtk_level in project.levels {
+		level := load_level(ldtk_level, project.defs.tilesets[0])
+		level.cell_grid = generate_cell_grid(level)
+		append(&levels, level)
 	}
 	return levels
 }
@@ -155,4 +161,28 @@ get_spawn_point :: proc(level: Level) -> rl.Vector2 {
 	}
 	assert(false)
 	return {0, 0}
+}
+
+generate_cell_grid :: proc(level: Level) -> [][]pathfinding.Cell {
+	cells := make([][]pathfinding.Cell, level.height / TILE_SIZE)
+	for i in 0 ..< level.height / TILE_SIZE {
+		cells[i] = make([]pathfinding.Cell, level.width / TILE_SIZE)
+		for y in 0 ..< level.width / TILE_SIZE {
+			// just defaulting to high cost, if it's 0 things will get weird
+			cells[i][y].cost = 1000
+		}
+	}
+	for tile in level.tiles {
+		cell := &cells[int(tile.position.y / TILE_SIZE)][int(tile.position.x / TILE_SIZE)]
+		// TODO add cost of tile
+		cell.walkable = !(.Collision in tile.properties)
+		cell.cost = 1
+		fmt.printfln(
+			"TILE %v POS &v",
+			cell,
+			[2]int{int(tile.position.x / TILE_SIZE), int(tile.position.y / TILE_SIZE)},
+		)
+	}
+
+	return cells
 }
