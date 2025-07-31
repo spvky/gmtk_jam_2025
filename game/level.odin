@@ -2,6 +2,7 @@ package game
 
 import ldtk "../ldtk"
 import "core:fmt"
+import "core:math"
 import "pathfinding"
 import rl "vendor:raylib"
 
@@ -149,7 +150,11 @@ add_entity :: proc(entities: ^[dynamic]Entity, entity_instance: ldtk.Entity_Inst
 
 draw_tiles :: proc(level: Level, tilesheet: rl.Texture) {
 	for tile in level.tiles {
-		rl.DrawTextureRec(tilesheet, tile.draw_coords, get_relative_position(tile.position + level.position), rl.WHITE)
+		relative_position := get_relative_position(tile.position + level.position)
+		relative_position.x = f32(int(relative_position.x))
+		relative_position.y = f32(int(relative_position.y))
+
+		rl.DrawTextureRec(tilesheet, tile.draw_coords, relative_position, rl.WHITE)
 	}
 }
 
@@ -177,11 +182,6 @@ generate_cell_grid :: proc(level: Level) -> [][]pathfinding.Cell {
 		// TODO add cost of tile
 		cell.walkable = !(.Collision in tile.properties)
 		cell.cost = 1
-		fmt.printfln(
-			"TILE %v POS &v",
-			cell,
-			[2]int{int(tile.position.x / TILE_SIZE), int(tile.position.y / TILE_SIZE)},
-		)
 	}
 
 	return cells
