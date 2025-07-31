@@ -21,7 +21,7 @@ GameState :: enum {
 }
 
 make_world :: proc() -> World {
-	return World{}
+	return World{player = make_player()}
 }
 
 destroy_world :: proc() {

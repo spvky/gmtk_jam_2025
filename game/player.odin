@@ -1,5 +1,6 @@
 package game
 
+import "core:fmt"
 import l "core:math/linalg"
 import rl "vendor:raylib"
 
@@ -28,7 +29,7 @@ PlayerTag :: enum {
 	Ghost,
 }
 
-make_player :: proc(tag: PlayerTag) -> Player {
+make_player :: proc() -> Player {
 	return Player{ radius = 20, state = PlayerMoving{}}
 }
 
