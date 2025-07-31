@@ -48,7 +48,7 @@ jobs:
           release: dev-2025-07
       - name: Build Game
         run: |
-          ./web_build.sh
+          ./build_web.sh
 
       - name: Prepare Deployment
         run: |
