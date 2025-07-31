@@ -1,5 +1,6 @@
 package game
 
+import ldtk "../ldtk"
 import "../utils"
 import "core:c"
 import "core:math"
@@ -21,6 +22,8 @@ run := true
 // temporary debug access
 bullet: rl.Texture
 
+tilesheet: rl.Texture
+
 init :: proc() {
 	WINDOW_WIDTH = 1600
 	WINDOW_HEIGHT = 900
@@ -29,6 +32,11 @@ init :: proc() {
 	world = make_world()
 	input_streams = make_input_streams()
 
+	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
+	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
+		world.levels = get_all_levels(project)
+		world.current_level = .Level
+	}
 	rl.SetTargetFPS(60)
 
 	bullet = utils.load_texture("./assets/bullet.png")
@@ -40,6 +48,7 @@ draw :: proc() {
 	rl.ClearBackground(rl.BLACK)
 	render_players()
 	display_clock()
+	draw_tiles(world.levels[0], tilesheet)
 	// temporary debug drawing
 	rl.DrawTextureEx(
 		bullet,
