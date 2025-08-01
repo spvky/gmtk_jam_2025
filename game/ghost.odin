@@ -24,8 +24,12 @@ apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick) {
 	new_velo := direction_to_vec(input.direction)
 	ghost.velocity = new_velo * PLAYER_MOVESPEED
 
-	// TODO treat things like 'shoot' and 'dodge roll'
+	// TODO treat 'dodge roll'
 	ghost.translation += ghost.velocity * TICK_RATE
+
+	if .Shoot in input.buttons {
+		append(&bullets, Bullet{.Ghost, StraightPath{input.mouse_rotation, 160}, ghost.translation, 0, 20})
+	}
 }
 
 update_ghosts :: proc() {

@@ -31,7 +31,7 @@ bullet_control := BulletControl {
 	bullet_color = {
 		.Player = {{118, 136, 169, 255}, {77, 100, 141, 255}, {21, 44, 85, 255}},
 		.Enemy = {{255, 170, 170, 255}, {212, 106, 106, 255}, {128, 21, 21, 255}},
-		.Ghost = {},
+		.Ghost = {{0, 0, 0, 255}, {255, 0, 255, 255}, {0, 0, 0, 255}},
 	},
 }
 
@@ -133,9 +133,9 @@ playing :: proc() {
 		reset_loop()
 	}
 
-	if rl.IsMouseButtonPressed(.LEFT) {
-		spawner := make_circle_spawner(.Player, world.player.translation, 10, 5, 20, 0.05, 45, 50)
-		append(&bullet_spawners, spawner)
+	input := world.current_input_tick
+	if .Shoot in input.buttons {
+		append(&bullets, Bullet{.Player, StraightPath{input.mouse_rotation, 160}, world.player.translation, 0, 20})
 	}
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
