@@ -135,6 +135,7 @@ playing :: proc() {
 		reset_loop()
 	}
 
+
 	input := world.current_input_tick
 	if .Shoot in input.buttons {
 		append(&bullets, Bullet{.Player, StraightPath{input.mouse_rotation, 160}, world.player.translation, 0, 20})
@@ -159,6 +160,9 @@ playing :: proc() {
 	u_time := f32(rl.GetTime())
 
 	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
+	if rl.IsKeyPressed(.END) {
+		kill_player(&world)
+	}
 }
 
 shutdown :: proc() {

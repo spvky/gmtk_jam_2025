@@ -249,8 +249,3 @@ handle_triggers :: proc(world: ^World) {
 		}
 	}
 }
-
-
-spawn_player :: proc(player: ^Player, level: Level) {
-	player.translation = get_spawn_point(level)
-}

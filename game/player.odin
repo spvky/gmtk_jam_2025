@@ -79,3 +79,16 @@ apply_player_velocities :: proc() {
 		}
 	}
 }
+
+spawn_player :: proc(player: ^Player, level: Level) {
+	player.translation = get_spawn_point(level)
+}
+
+kill_player :: proc(world: ^World) {
+	//TODO: death animation, death screen(?), transition
+
+	level := world.levels[world.current_level]
+	world.current_level = .Hub
+	level = world.levels[world.current_level]
+	spawn_player(&world.player, level)
+}
