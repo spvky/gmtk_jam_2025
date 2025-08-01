@@ -47,6 +47,7 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 			current_animation = enemy_animations[tag][.Idle],
 			current_frame = enemy_animations[tag][.Idle].start,
 		},
+		prev_state = .Idle,
 		state = .Attack,
 		position = position,
 	}
@@ -55,7 +56,10 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 enemy_transition_state :: proc() {
 	for &enemy in enemies {
 		if enemy.prev_state != enemy.state {
-
+			new_anim := enemy_animations[enemy.tag][enemy.state]
+			enemy.animation_player.animation_progression = 0
+			enemy.animation_player.current_frame = new_anim.start
+			enemy.animation_player.current_animation = new_anim
 		}
 		enemy.prev_state = enemy.state
 	}
@@ -107,7 +111,7 @@ enemy_attack :: proc(enemy: ^Enemy) {
 	switch enemy.tag {
 	case .Skeleton:
 	case .Vampire:
-		spawner := make_circle_spawner(.Enemy, enemy.position, 4, 2, 20, 0.25, 45, 100)
+		spawner := make_circle_spawner(.Enemy, enemy.position, 4, 2, 5, 0.15, 45, 100)
 		append(&bullet_spawners, spawner)
 	}
 }

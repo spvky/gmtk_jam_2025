@@ -150,6 +150,7 @@ playing :: proc() {
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
 	update_enemies(flow_field)
+	enemy_transition_state()
 
 	u_time := f32(rl.GetTime())
 
