@@ -7,7 +7,7 @@ import rl "vendor:raylib"
 display_clock :: proc() {
 	time_to_display := 100.0 - world.loop_time
 	time_string := fmt.tprintf("%3.2f", time_to_display)
-	rl.DrawText(strings.clone_to_cstring(time_string), 375,10,24,rl.WHITE)
+	rl.DrawText(strings.clone_to_cstring(time_string), 375, 10, 24, rl.WHITE)
 }
 
 reset_loop :: proc() {
