@@ -25,16 +25,15 @@ Bullet :: struct {
 }
 
 BulletSpawner :: struct {
-	tag:            BulletTag,
-	position:       Vec2,
-	wave_count:     int,
-	waves_fired:    int,
-	shot_count:     int,
-	distance:       f32,
-	rotation_speed: f32,
-	travel_speed:   f32,
-	shot_cooldown:  f32,
-	shot_progress:  f32,
+	tag:           BulletTag,
+	position:      Vec2,
+	wave_count:    int,
+	waves_fired:   int,
+	shot_count:    int,
+	distance:      f32,
+	bullet_path:   BulletPath,
+	shot_cooldown: f32,
+	shot_progress: f32,
 }
 
 BulletPath :: union #no_nil {
@@ -45,13 +44,14 @@ BulletPath :: union #no_nil {
 StraightPath :: struct {
 	angle: f32,
 	speed: f32,
+	arc:   f32,
 }
 
 SpiralPath :: struct {
 	anchor:         Vec2,
 	current_angle:  f32,
 	current_radius: f32,
-	expand_speed:   f32,
+	travel_speed:   f32,
 	rotation_speed: f32,
 }
 
@@ -60,7 +60,7 @@ make_spiral_bullet :: proc(
 	anchor: Vec2,
 	starting_angle: f32,
 	starting_radius: f32,
-	expand_speed: f32,
+	travel_speed: f32,
 	rotation_speed: f32,
 ) -> Bullet {
 	return Bullet {
@@ -70,36 +70,31 @@ make_spiral_bullet :: proc(
 			anchor = anchor,
 			current_angle = l.to_radians(starting_angle),
 			current_radius = starting_radius,
-			expand_speed = expand_speed,
+			travel_speed = travel_speed,
 			rotation_speed = rotation_speed,
 		},
 		lifetime = 2,
 	}
 }
+make_straight_bullet :: proc(tag: BulletTag, source: Vec2, angle: f32, speed: f32) -> Bullet {
+	return Bullet{tag = tag, position = source, path = StraightPath{angle = angle, speed = speed}, lifetime = 20}
+}
 
-make_bullet_arc :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32) {
+make_arc_shot :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32, speed: f32 = 160) {
 	if amount > 1 {
 		min_angle := l.to_degrees(angle) - arc / 2
 		arc_increment := arc / f32(amount)
 
 		for i in 0 ..= amount {
 			shot_angle := min_angle + (f32(i) * arc_increment)
-			append(
-				&bullets,
-				Bullet {
-					tag = tag,
-					path = StraightPath{l.to_radians(shot_angle), 160},
-					position = source,
-					lifetime = 20,
-				},
-			)
+			append(&bullets, make_straight_bullet(tag, source, l.to_radians(shot_angle), speed))
 		}
 	} else {
-		append(&bullets, Bullet{tag = tag, path = StraightPath{angle, 160}, position = source, lifetime = 20})
+		append(&bullets, make_straight_bullet(tag, source, angle, speed))
 	}
 }
 
-make_shot_circle :: proc(
+make_spiral_shot :: proc(
 	tag: BulletTag,
 	source: Vec2,
 	shot_count: int,
@@ -125,22 +120,47 @@ make_circle_spawner :: proc(
 		shot_count = shot_count,
 		wave_count = wave_count,
 		distance = distance,
-		rotation_speed = rotation_speed,
-		travel_speed = travel_speed,
+		bullet_path = SpiralPath{rotation_speed = rotation_speed, travel_speed = travel_speed},
+		shot_progress = shot_cooldown,
+		shot_cooldown = shot_cooldown,
+	}
+}
+
+import "core:fmt"
+
+make_arc_spawner :: proc(
+	tag: BulletTag,
+	source: Vec2,
+	shot_count, wave_count: int,
+	distance, shot_cooldown, angle, arc, speed: f32,
+) -> BulletSpawner {
+	return BulletSpawner {
+		tag = tag,
+		position = source,
+		shot_count = shot_count,
+		wave_count = wave_count,
+		distance = distance,
+		bullet_path = StraightPath{angle = angle, speed = speed, arc = arc},
 		shot_progress = shot_cooldown,
 		shot_cooldown = shot_cooldown,
 	}
 }
 
 spawner_shoot :: proc(spawner: ^BulletSpawner) {
-	make_shot_circle(
-		spawner.tag,
-		spawner.position,
-		spawner.shot_count,
-		spawner.distance,
-		spawner.rotation_speed,
-		spawner.travel_speed,
-	)
+	switch path in spawner.bullet_path {
+	case SpiralPath:
+		make_spiral_shot(
+			spawner.tag,
+			spawner.position,
+			spawner.shot_count,
+			spawner.distance,
+			path.rotation_speed,
+			path.travel_speed,
+		)
+	case StraightPath:
+		make_arc_shot(spawner.tag, spawner.position, path.angle, spawner.shot_count, path.arc, path.speed)
+	}
+
 	spawner.waves_fired += 1
 	spawner.shot_progress = 0
 }
@@ -190,7 +210,7 @@ manage_bullet_path :: proc() {
 		case SpiralPath:
 			bullet.position.x = path.anchor.x + path.current_radius * m.cos(path.current_angle)
 			bullet.position.y = path.anchor.y + path.current_radius * m.sin(path.current_angle)
-			path.current_radius += path.expand_speed * TICK_RATE
+			path.current_radius += path.travel_speed * TICK_RATE
 			path.current_angle += l.to_radians(path.rotation_speed) * TICK_RATE
 		}
 		bullet.current_life += TICK_RATE

@@ -28,7 +28,7 @@ apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick) {
 	ghost.translation += ghost.velocity * TICK_RATE
 
 	if .Shoot in input.buttons {
-		append(&bullets, Bullet{.Ghost, StraightPath{input.mouse_rotation, 160}, ghost.translation, 0, 20})
+		append(&bullets, Bullet{.Ghost, StraightPath{input.mouse_rotation, 160, 22.5}, ghost.translation, 0, 20})
 	}
 }
 
