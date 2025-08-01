@@ -1,12 +1,14 @@
 package game
 
 import "core:fmt"
+import "core:math"
 import rl "vendor:raylib"
 
 Enemy :: struct {
 	tag:              EnemyTag,
 	animation_player: AnimationPlayer,
 	position:         rl.Vector2,
+	direction:        rl.Vector2,
 }
 
 EnemyTag :: enum {
@@ -65,8 +67,22 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
 	for &enemy in enemies {
 		grid_position := (enemy.position / TILE_SIZE)
-		direction := flow_field[int(grid_position.y)][int(grid_position.x)]
+
+		grid_source_pos: [2]int = {int(math.floor(grid_position.x)), int(math.floor(grid_position.y))}
+		// if we are moving upwards we want to wait until we are 'leaving' the square
+		// until we source the new flow field instruction
+		// otherwise, we get weird behaviour because as we barely cross the coordinate border from 1.0 to 0.99
+		// we will now use the instruction at 0. instead of 1, despite us being at the top part of 1, moving up towards 0.
+
+		if enemy.direction.x < 0 {
+			grid_source_pos.x = int(math.ceil(grid_position.x))
+		}
+		if enemy.direction.y < 0 {
+			grid_source_pos.y = int(math.ceil(grid_position.y))
+		}
+		direction := flow_field[grid_source_pos.y][grid_source_pos.x]
 		enemy.position += direction
+		enemy.direction = direction
 		animate_enemy(&enemy)
 	}
 }
