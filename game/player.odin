@@ -13,6 +13,8 @@ Player :: struct {
 	velocity:       Vec2,
 	radius:         f32,
 	dodge_cooldown: f32,
+	shot_amount:    int,
+	shot_spread:    f32,
 }
 
 PlayerState :: union {
@@ -28,7 +30,7 @@ PlayerDodging :: struct {
 }
 
 make_player :: proc() -> Player {
-	return Player{radius = 8, state = PlayerMoving{}}
+	return Player{radius = 8, state = PlayerMoving{}, shot_amount = 1, shot_spread = 22.5}
 }
 
 render_players :: proc() {

@@ -77,6 +77,28 @@ make_spiral_bullet :: proc(
 	}
 }
 
+make_bullet_arc :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32) {
+	if amount > 1 {
+		min_angle := l.to_degrees(angle) - arc / 2
+		arc_increment := arc / f32(amount)
+
+		for i in 0 ..= amount {
+			shot_angle := min_angle + (f32(i) * arc_increment)
+			append(
+				&bullets,
+				Bullet {
+					tag = tag,
+					path = StraightPath{l.to_radians(shot_angle), 160},
+					position = source,
+					lifetime = 20,
+				},
+			)
+		}
+	} else {
+		append(&bullets, Bullet{tag = tag, path = StraightPath{angle, 160}, position = source, lifetime = 20})
+	}
+}
+
 make_shot_circle :: proc(
 	tag: BulletTag,
 	source: Vec2,

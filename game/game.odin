@@ -138,7 +138,13 @@ playing :: proc() {
 
 	input := world.current_input_tick
 	if .Shoot in input.buttons {
-		append(&bullets, Bullet{.Player, StraightPath{input.mouse_rotation, 160}, world.player.translation, 0, 20})
+		make_bullet_arc(
+			.Player,
+			world.player.translation,
+			input.mouse_rotation,
+			world.player.shot_amount,
+			world.player.shot_spread,
+		)
 	}
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
