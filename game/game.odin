@@ -23,6 +23,12 @@ run := true
 
 //temp enemy
 enemies: [dynamic]Enemy
+bullets: [dynamic]Bullet
+bullet_spawners: [dynamic]BulletSpawner
+
+bullet_control := BulletControl {
+	bullet_color = rl.WHITE,
+}
 
 // temporary debug access
 
@@ -41,6 +47,8 @@ init :: proc() {
 	enemy_texture_atlas = make_enemy_texture_atlas()
 	input_streams = make_input_streams()
 	enemies = make([dynamic]Enemy, 0, 32)
+	bullets = make([dynamic]Bullet, 0, 128)
+	bullet_spawners = make([dynamic]BulletSpawner, 0, 16)
 	append(&enemies, make_enemy(.Skeleton, {250, 200}))
 	append(&enemies, make_enemy(.Vampire, {450, 200}))
 
@@ -54,6 +62,17 @@ init :: proc() {
 }
 
 
+update :: proc() {
+	switch world.game_state {
+	case .Playing:
+		playing()
+	case .Paused:
+	case .MainMenu:
+	case .Looping:
+	}
+	free_all(context.temp_allocator)
+}
+
 draw :: proc() {
 	rl.BeginTextureMode(screen_texture)
 	rl.ClearBackground(rl.BLACK)
@@ -61,6 +80,7 @@ draw :: proc() {
 	draw_tiles(world.levels[world.current_level], tilesheet)
 	render_players()
 	draw_enemies()
+	draw_bullets()
 	rl.EndTextureMode()
 
 
@@ -75,17 +95,6 @@ draw :: proc() {
 		rl.WHITE,
 	)
 	rl.EndDrawing()
-}
-
-update :: proc() {
-	switch world.game_state {
-	case .Playing:
-		playing()
-	case .Paused:
-	case .MainMenu:
-	case .Looping:
-	}
-	free_all(context.temp_allocator)
 }
 
 // Gameplay Code
@@ -111,6 +120,12 @@ playing :: proc() {
 
 	if rl.IsKeyPressed(.R) {
 		reset_loop()
+	}
+
+	if rl.IsKeyPressed(.LEFT_CONTROL) {
+		anchor := get_relative_position(world.player.translation)
+		spawner := make_circle_spawner(anchor, 10, 5, 20, 0.05, 90, 300)
+		append(&bullet_spawners, spawner)
 	}
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
