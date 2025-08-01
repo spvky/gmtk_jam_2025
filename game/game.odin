@@ -86,7 +86,8 @@ draw :: proc() {
 	rl.BeginTextureMode(screen_texture)
 	rl.ClearBackground(rl.BLACK)
 	display_clock()
-	draw_tiles(world.levels[world.current_level], tilesheet)
+	draw_tiles(world.levels[world.current_level], tilesheet, .Structure)
+	draw_tiles(world.levels[world.current_level], tilesheet, .Decor)
 	render_players()
 	draw_enemies()
 	draw_bullets()
@@ -132,7 +133,7 @@ playing :: proc() {
 		reset_loop()
 	}
 
-	if rl.IsKeyPressed(.LEFT_CONTROL) {
+	if rl.IsMouseButtonPressed(.LEFT) {
 		spawner := make_circle_spawner(.Player, world.player.translation, 10, 5, 20, 0.05, 45, 50)
 		append(&bullet_spawners, spawner)
 	}
