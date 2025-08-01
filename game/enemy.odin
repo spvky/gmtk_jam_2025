@@ -114,6 +114,12 @@ draw_enemies :: proc() {
 			width  = 32,
 			height = 32,
 		}
+		// debug
+		// rl.DrawRectangleV(relative_position, {16, 16}, rl.WHITE)
+		// rl.DrawLineV(relative_position, relative_position + enemy.direction * 16, rl.GREEN)
+		// we are correctly computing the position for the enemies, but because the sprite sizes are not what we anticipate the dimenions here are iffy and we end up drawing from 1 tile^2 to the topleft.
+		// but you can uncomment the debug drawing to validate
+
 		rl.DrawTextureRec(enemy.animation_player.texture^, source_rect, relative_position, rl.WHITE)
 	}
 }
