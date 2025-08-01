@@ -30,11 +30,13 @@ Tile :: struct {
 	alpha:       f32,
 	position:    rl.Vector2,
 	properties:  bit_set[Tile_Property],
+	type:        Layer_Type,
 }
 
 Tile_Property :: enum {
 	Collision,
 	Harmful,
+	Decor,
 }
 
 Entity :: struct {
@@ -45,6 +47,11 @@ Entity :: struct {
 
 Entity_Type :: enum {
 	Player_Spawn,
+}
+
+Layer_Type :: enum {
+	Structure,
+	Decor,
 }
 
 get_all_levels :: proc(project: ldtk.Project) -> [dynamic]Level {
@@ -72,11 +79,11 @@ load_level :: proc(level: ldtk.Level, tileset_def: ldtk.Tileset_Definition) -> L
 			}
 		case .Tiles:
 			for tile in layer.grid_tiles {
-				add_tile(&tiles, tileset_def, tile)
+				add_tile(&tiles, tileset_def, tile, .Decor)
 			}
 		case .AutoLayer, .IntGrid:
 			for tile in layer.auto_layer_tiles {
-				add_tile(&tiles, tileset_def, tile)
+				add_tile(&tiles, tileset_def, tile, .Structure)
 			}
 		}
 	}
@@ -100,12 +107,20 @@ get_tile_properties :: proc(properties: [dynamic]string) -> bit_set[Tile_Propert
 
 		case "Harmful":
 			property_set = property_set | {.Harmful}
+
+		case "Decor":
+			property_set = property_set | {.Decor}
 		}
 	}
 	return property_set
 }
 
-add_tile :: proc(tiles: ^[dynamic]Tile, tileset_definition: ldtk.Tileset_Definition, tile: ldtk.Tile_Instance) {
+add_tile :: proc(
+	tiles: ^[dynamic]Tile,
+	tileset_definition: ldtk.Tileset_Definition,
+	tile: ldtk.Tile_Instance,
+	type: Layer_Type,
+) {
 	raw_properties: [dynamic]string
 	for def in tileset_definition.enum_tags {
 		found := false
@@ -129,6 +144,7 @@ add_tile :: proc(tiles: ^[dynamic]Tile, tileset_definition: ldtk.Tileset_Definit
 			tile.a,
 			{f32(tile.px[0]), f32(tile.px[1])},
 			properties,
+			type,
 		},
 	)
 
@@ -148,15 +164,18 @@ add_entity :: proc(entities: ^[dynamic]Entity, entity_instance: ldtk.Entity_Inst
 	append(entities, entity)
 }
 
-draw_tiles :: proc(level: Level, tilesheet: rl.Texture) {
+draw_tiles :: proc(level: Level, tilesheet: rl.Texture, layer: Layer_Type) {
 	for tile in level.tiles {
-		relative_position := get_relative_position(tile.position + level.position)
-		relative_position.x = f32(int(relative_position.x))
-		relative_position.y = f32(int(relative_position.y))
+		if tile.type == layer {
+			relative_position := get_relative_position(tile.position + level.position)
+			relative_position.x = f32(int(relative_position.x))
+			relative_position.y = f32(int(relative_position.y))
 
-		rl.DrawTextureRec(tilesheet, tile.draw_coords, relative_position, rl.WHITE)
+			rl.DrawTextureRec(tilesheet, tile.draw_coords, relative_position, rl.WHITE)
+		}
 	}
 }
+
 
 get_spawn_point :: proc(level: Level) -> rl.Vector2 {
 	for entity in level.entities {
