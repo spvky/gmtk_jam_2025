@@ -11,7 +11,7 @@ Camera :: struct {
 camera: Camera
 
 
-get_relative_position :: proc(abs_position: rl.Vector2) -> rl.Vector2 {
+get_relative_position :: proc(abs_position: Vec2) -> Vec2 {
 	// how strongly the camera should follow the mouse cursor
 	camera_strength_factor :: 85
 

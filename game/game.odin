@@ -123,8 +123,7 @@ playing :: proc() {
 	}
 
 	if rl.IsKeyPressed(.LEFT_CONTROL) {
-		anchor := get_relative_position(world.player.translation)
-		spawner := make_circle_spawner(anchor, 10, 5, 20, 0.05, 90, 300)
+		spawner := make_circle_spawner(world.player.translation, 10, 5, 20, 0.05, 45, 50)
 		append(&bullet_spawners, spawner)
 	}
 

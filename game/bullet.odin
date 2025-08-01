@@ -123,7 +123,8 @@ update_bullets :: proc() {
 
 draw_bullets :: proc() {
 	for bullet in bullets {
-		rl.DrawCircleV(bullet.position, 8, bullet_control.bullet_color)
+		pos := get_relative_position(bullet.position)
+		rl.DrawCircleV(pos, 8, bullet_control.bullet_color)
 	}
 }
 
