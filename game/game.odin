@@ -64,6 +64,8 @@ init :: proc() {
 		world.levels = get_all_levels(project)
 		world.current_level = .Hub
 	}
+
+	spawn_player(&world.player, world.levels[world.current_level])
 	rl.SetTargetFPS(60)
 
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
@@ -146,9 +148,11 @@ playing :: proc() {
 	cells := level.cell_grid
 
 	grid_position := (world.player.translation - level.position) / TILE_SIZE
+
 	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
+	handle_triggers(&world)
 	update_enemies(flow_field)
 	enemy_transition_state()
 

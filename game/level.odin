@@ -36,7 +36,6 @@ Tile :: struct {
 Tile_Property :: enum {
 	Collision,
 	Harmful,
-	Decor,
 }
 
 Entity :: struct {
@@ -47,6 +46,7 @@ Entity :: struct {
 
 Entity_Type :: enum {
 	Player_Spawn,
+	Next_Level,
 }
 
 Layer_Type :: enum {
@@ -108,8 +108,6 @@ get_tile_properties :: proc(properties: [dynamic]string) -> bit_set[Tile_Propert
 		case "Harmful":
 			property_set = property_set | {.Harmful}
 
-		case "Decor":
-			property_set = property_set | {.Decor}
 		}
 	}
 	return property_set
@@ -159,6 +157,9 @@ add_entity :: proc(entities: ^[dynamic]Entity, entity_instance: ldtk.Entity_Inst
 	switch entity_instance.identifier {
 	case "Player_Spawn":
 		entity.type = .Player_Spawn
+
+	case "Next_Level":
+		entity.type = .Next_Level
 	}
 
 	append(entities, entity)
@@ -205,4 +206,51 @@ generate_cell_grid :: proc(level: Level) -> [][]pathfinding.Cell {
 	}
 
 	return cells
+}
+
+check_triggers :: proc(level: Level, player: Player) -> Maybe(Entity_Type) {
+
+	player_rec := rl.Rectangle{player.translation[0], player.translation[1], TILE_SIZE, TILE_SIZE}
+	for entity in level.entities {
+
+		trigger_rec := rl.Rectangle{entity.position[0], entity.position[1], TILE_SIZE, TILE_SIZE}
+
+		if rl.CheckCollisionRecs(player_rec, trigger_rec) {
+			return entity.type
+		}
+
+	}
+	return nil
+}
+
+handle_triggers :: proc(world: ^World) {
+
+	level := world.levels[world.current_level]
+	player := &world.player
+	player_rec := rl.Rectangle{player.translation[0], player.translation[1], TILE_SIZE, TILE_SIZE}
+
+	for tile in level.tiles {
+		if (.Harmful in tile.properties) {
+			tile_rec := rl.Rectangle{tile.position[0], tile.position[1], TILE_SIZE, TILE_SIZE}
+
+			if rl.CheckCollisionRecs(player_rec, tile_rec) {
+				//TODO: damage player
+			}
+		}
+	}
+
+	if entity_type, ok := check_triggers(level, player^).?; ok {
+		#partial switch entity_type {
+
+		case .Next_Level:
+			world.current_level = .Level
+			level = world.levels[world.current_level]
+			spawn_player(player, level)
+		}
+	}
+}
+
+
+spawn_player :: proc(player: ^Player, level: Level) {
+	player.translation = get_spawn_point(level)
 }
