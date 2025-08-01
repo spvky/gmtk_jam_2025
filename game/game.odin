@@ -25,7 +25,6 @@ run := true
 enemies: [dynamic]Enemy
 
 // temporary debug access
-bullet: rl.Texture
 
 tilesheet: rl.Texture
 
@@ -52,24 +51,15 @@ init :: proc() {
 	}
 	rl.SetTargetFPS(60)
 
-	bullet = utils.load_texture("./assets/bullet.png")
 }
 
 
 draw :: proc() {
 	rl.BeginTextureMode(screen_texture)
 	rl.ClearBackground(rl.BLACK)
-	render_players()
 	display_clock()
 	draw_tiles(world.levels[world.current_level], tilesheet)
-	// temporary debug drawing
-	rl.DrawTextureEx(
-		bullet,
-		get_relative_position(world.player.translation),
-		world.current_input_tick.mouse_rotation * math.DEG_PER_RAD,
-		3,
-		rl.WHITE,
-	)
+	render_players()
 	draw_enemies()
 	rl.EndTextureMode()
 
