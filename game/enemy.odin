@@ -11,7 +11,10 @@ Enemy :: struct {
 	direction:        rl.Vector2,
 	state:            EnemyState,
 	prev_state:       EnemyState,
+	spawned_tick:     u16,
 }
+
+SPAWN_TIME_TICKS :: 60
 
 EnemyTag :: enum {
 	Skeleton,
@@ -30,6 +33,7 @@ enemy_attack_frame_from_tag :: proc(tag: EnemyTag) -> int {
 }
 
 EnemyState :: enum {
+	Spawning,
 	Idle,
 	Movement,
 	Attack,
@@ -47,9 +51,10 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 			current_animation = enemy_animations[tag][.Idle],
 			current_frame = enemy_animations[tag][.Idle].start,
 		},
-		prev_state = .Idle,
-		state = .Attack,
+		prev_state = .Spawning,
+		state = .Spawning,
 		position = position,
+		spawned_tick = world.current_tick,
 	}
 }
 
@@ -85,6 +90,12 @@ update_enemies :: proc(flow_field: [][]rl.Vector2) {
 		enemy.position += direction
 		enemy.direction = direction
 		animate_enemy(&enemy)
+
+		if enemy.state == .Spawning {
+			if world.current_tick >= enemy.spawned_tick + SPAWN_TIME_TICKS {
+				enemy.state = .Idle
+			}
+		}
 	}
 }
 
@@ -118,6 +129,7 @@ enemy_attack :: proc(enemy: ^Enemy) {
 
 draw_enemies :: proc() {
 	for enemy in enemies {
+		if enemy.state == .Spawning {continue} 	// TODO
 		relative_position := get_relative_position(enemy.position)
 		current_frame := enemy.animation_player.current_frame
 		x_position := f32(current_frame % 9) * 32
