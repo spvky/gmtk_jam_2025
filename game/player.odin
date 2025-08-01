@@ -8,20 +8,23 @@ PLAYER_MOVESPEED :: 100
 PLAYER_ROLL_DISTANCE :: 100
 
 Player :: struct {
-	state:					PlayerState,
-	translation:		Vec2,
-	velocity:				Vec2,
-	radius:					f32,
-	dodge_cooldown:	f32,
+	state:          PlayerState,
+	translation:    Vec2,
+	velocity:       Vec2,
+	radius:         f32,
+	dodge_cooldown: f32,
 }
 
-PlayerState :: union {PlayerMoving, PlayerDodging}
+PlayerState :: union {
+	PlayerMoving,
+	PlayerDodging,
+}
 
-PlayerMoving :: struct{}
+PlayerMoving :: struct {}
 PlayerDodging :: struct {
-	target: Vec2,
+	target:   Vec2,
 	duration: f32,
-	progress: f32
+	progress: f32,
 }
 
 PlayerTag :: enum {
@@ -30,7 +33,7 @@ PlayerTag :: enum {
 }
 
 make_player :: proc() -> Player {
-	return Player{ radius = 20, state = PlayerMoving{}}
+	return Player{radius = 8, state = PlayerMoving{}}
 }
 
 render_players :: proc() {
@@ -38,7 +41,7 @@ render_players :: proc() {
 	color := rl.BLUE
 
 	relative_position := get_relative_position(player.translation)
-	rl.DrawCircleV(relative_position, 20, color)
+	rl.DrawRectangleV(relative_position, {player.radius * 2, player.radius * 2}, color)
 }
 
 player_dodge :: proc() {
@@ -48,13 +51,13 @@ player_dodge :: proc() {
 	direction := direction_to_vec(input.direction)
 
 	if player.dodge_cooldown > 0 {
-		player.dodge_cooldown = clamp(player.dodge_cooldown - TICK_RATE, 0,player.dodge_cooldown)
+		player.dodge_cooldown = clamp(player.dodge_cooldown - TICK_RATE, 0, player.dodge_cooldown)
 	}
 
 	if player.dodge_cooldown == 0 && should_dodge && input.direction != .Neutral {
 		player.state = PlayerDodging {
-			target = player.translation + (direction * PLAYER_ROLL_DISTANCE),
-			duration = 0.2
+			target   = player.translation + (direction * PLAYER_ROLL_DISTANCE),
+			duration = 0.2,
 		}
 		player.dodge_cooldown = 1
 	}
