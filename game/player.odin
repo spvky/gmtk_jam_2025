@@ -27,11 +27,6 @@ PlayerDodging :: struct {
 	progress: f32,
 }
 
-PlayerTag :: enum {
-	Player,
-	Ghost,
-}
-
 make_player :: proc() -> Player {
 	return Player{radius = 8, state = PlayerMoving{}}
 }

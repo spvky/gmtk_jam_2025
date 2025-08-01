@@ -24,6 +24,7 @@ run := true
 //temp enemy
 enemies: [dynamic]Enemy
 bullets: [dynamic]Bullet
+ghosts: [dynamic]Ghost
 bullet_spawners: [dynamic]BulletSpawner
 
 bullet_control := BulletControl {
@@ -41,6 +42,8 @@ tilesheet: rl.Texture
 // TODO move somewhere sensible
 cost_map: [][]int
 flow_field: [][]rl.Vector2
+
+ghost_shader: rl.Shader
 
 init :: proc() {
 	WINDOW_WIDTH = 1600
@@ -62,6 +65,9 @@ init :: proc() {
 		world.current_level = .Hub
 	}
 	rl.SetTargetFPS(60)
+
+	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
+	append(&ghosts, Ghost{})
 }
 
 
@@ -84,6 +90,7 @@ draw :: proc() {
 	render_players()
 	draw_enemies()
 	draw_bullets()
+	draw_ghosts()
 	rl.EndTextureMode()
 
 
@@ -142,6 +149,10 @@ playing :: proc() {
 	flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
 	update_enemies(flow_field)
+
+	u_time := f32(rl.GetTime())
+
+	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
 }
 
 shutdown :: proc() {
