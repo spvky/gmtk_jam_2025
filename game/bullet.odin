@@ -163,7 +163,7 @@ manage_bullet_path :: proc() {
 	for &bullet, i in bullets {
 		switch &path in bullet.path {
 		case StraightPath:
-			direction := l.normalize(Vec2{m.sin(path.angle), m.cos(path.angle)})
+			direction := l.normalize(Vec2{m.cos(path.angle), m.sin(path.angle)})
 			bullet.position += direction * path.speed * TICK_RATE
 		case SpiralPath:
 			bullet.position.x = path.anchor.x + path.current_radius * m.cos(path.current_angle)
