@@ -9,11 +9,24 @@ Enemy :: struct {
 	animation_player: AnimationPlayer,
 	position:         rl.Vector2,
 	direction:        rl.Vector2,
+	state:            EnemyState,
+	prev_state:       EnemyState,
 }
 
 EnemyTag :: enum {
 	Skeleton,
 	Vampire,
+}
+
+enemy_attack_frame_from_tag :: proc(tag: EnemyTag) -> int {
+	frame: int
+	switch tag {
+	case .Skeleton:
+		frame = 24
+	case .Vampire:
+		frame = 38
+	}
+	return frame
 }
 
 EnemyState :: enum {
@@ -34,34 +47,18 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 			current_animation = enemy_animations[tag][.Idle],
 			current_frame = enemy_animations[tag][.Idle].start,
 		},
+		state = .Attack,
 		position = position,
 	}
+}
 
-	// 	switch tag {
-	// 	case .Skeleton:
-	// 		enemy = {
-	// 			tag = .Skeleton,
-	// 			animation_player = AnimationPlayer {
-	// 				frame_length = 0.1,
-	// 				texture = &texture_atlas[.Skeleton],
-	// 				current_animation = skeleton_animations[.Idle],
-	// 				current_frame = skeleton_animations[.Idle].start,
-	// 			},
-	// 			position = position,
-	// 		}
-	// 	case .Vampire:
-	// 		enemy = {
-	// 			tag = .Vampire,
-	// 			animation_player = AnimationPlayer {
-	// 				frame_length = 0.1,
-	// 				texture = &texture_atlas[.Vampire],
-	// 				current_animation = skeleton_animations[.Idle],
-	// 				current_frame = skeleton_animations[.Idle].start,
-	// 			},
-	// 			position = position,
-	// 		}
-	// 	}
-	// 	return enemy
+enemy_transition_state :: proc() {
+	for &enemy in enemies {
+		if enemy.prev_state != enemy.state {
+
+		}
+		enemy.prev_state = enemy.state
+	}
 }
 
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
@@ -92,6 +89,7 @@ animate_enemy :: proc(enemy: ^Enemy) {
 
 	anim.animation_progression += TICK_RATE
 	if anim.animation_progression > anim.frame_length {
+		attack_frame := enemy_attack_frame_from_tag(enemy.tag)
 		anim.animation_progression = 0
 		new_frame := anim.current_frame + 1
 		if new_frame > anim.current_animation.end {
@@ -99,6 +97,18 @@ animate_enemy :: proc(enemy: ^Enemy) {
 		}
 
 		anim.current_frame = new_frame
+		if new_frame == attack_frame {
+			enemy_attack(enemy)
+		}
+	}
+}
+
+enemy_attack :: proc(enemy: ^Enemy) {
+	switch enemy.tag {
+	case .Skeleton:
+	case .Vampire:
+		spawner := make_circle_spawner(.Enemy, enemy.position, 4, 2, 20, 0.25, 45, 100)
+		append(&bullet_spawners, spawner)
 	}
 }
 

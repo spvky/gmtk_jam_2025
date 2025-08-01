@@ -25,7 +25,7 @@ enemy_animations := [EnemyTag][EnemyState]Animation {
 	.Vampire = {
 		.Idle = {start = 0, end = 5},
 		.Movement = {start = 6, end = 13},
-		.Attack = {start = 28, end = 26},
-		.Die = {start = 14, end = 43},
+		.Attack = {start = 28, end = 43},
+		.Die = {start = 14, end = 27},
 	},
 }
