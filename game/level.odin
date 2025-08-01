@@ -175,6 +175,7 @@ generate_cell_grid :: proc(level: Level) -> [][]pathfinding.Cell {
 		for y in 0 ..< level.width / TILE_SIZE {
 			// just defaulting to high cost, if it's 0 things will get weird
 			cells[i][y].cost = 1000
+			cells[i][y].walkable = false
 		}
 	}
 	for tile in level.tiles {
