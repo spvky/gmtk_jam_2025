@@ -56,8 +56,6 @@ init :: proc() {
 	enemies = make([dynamic]Enemy, 0, 32)
 	bullets = make([dynamic]Bullet, 0, 128)
 	bullet_spawners = make([dynamic]BulletSpawner, 0, 16)
-	append(&enemies, make_enemy(.Skeleton, {250, 200}))
-	append(&enemies, make_enemy(.Vampire, {450, 200}))
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
@@ -70,6 +68,8 @@ init :: proc() {
 
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
 	append(&ghosts, Ghost{})
+
+	init_waves()
 }
 
 
@@ -163,11 +163,16 @@ playing :: proc() {
 	update_enemies(flow_field)
 	enemy_transition_state()
 
+
 	u_time := f32(rl.GetTime())
 
 	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
 	if rl.IsKeyPressed(.END) {
 		kill_player(&world)
+	}
+
+	if wave, ok := waves[world.loop_number][world.current_tick].?; ok {
+		spawn_wave(wave, level)
 	}
 }
 
