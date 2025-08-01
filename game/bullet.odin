@@ -5,11 +5,19 @@ import l "core:math/linalg"
 import rl "vendor:raylib"
 
 BulletControl :: struct {
-	bullet_progress: f32,
-	bullet_color:    rl.Color,
+	bullet_progress:    f32,
+	bullet_color_index: int,
+	bullet_color:       [BulletTag][3]rl.Color,
+}
+
+BulletTag :: enum {
+	Player,
+	Enemy,
+	Ghost,
 }
 
 Bullet :: struct {
+	tag:          BulletTag,
 	path:         BulletPath,
 	position:     Vec2,
 	current_life: f32,
@@ -17,6 +25,7 @@ Bullet :: struct {
 }
 
 BulletSpawner :: struct {
+	tag:            BulletTag,
 	position:       Vec2,
 	wave_count:     int,
 	waves_fired:    int,
@@ -47,6 +56,7 @@ SpiralPath :: struct {
 }
 
 make_spiral_bullet :: proc(
+	tag: BulletTag,
 	anchor: Vec2,
 	starting_angle: f32,
 	starting_radius: f32,
@@ -54,6 +64,7 @@ make_spiral_bullet :: proc(
 	rotation_speed: f32,
 ) -> Bullet {
 	return Bullet {
+		tag = tag,
 		position = anchor,
 		path = SpiralPath {
 			anchor = anchor,
@@ -66,20 +77,28 @@ make_spiral_bullet :: proc(
 	}
 }
 
-make_shot_circle :: proc(source: Vec2, shot_count: int, distance: f32, rotation_speed, spread_speed: f32) {
+make_shot_circle :: proc(
+	tag: BulletTag,
+	source: Vec2,
+	shot_count: int,
+	distance: f32,
+	rotation_speed, spread_speed: f32,
+) {
 	angle_between := 360.0 / f32(shot_count)
 	for i in 0 ..= shot_count {
 		angle := f32(i) * angle_between
-		append(&bullets, make_spiral_bullet(source, angle, distance, spread_speed, rotation_speed))
+		append(&bullets, make_spiral_bullet(tag, source, angle, distance, spread_speed, rotation_speed))
 	}
 }
 
 make_circle_spawner :: proc(
+	tag: BulletTag,
 	source: Vec2,
 	shot_count, wave_count: int,
 	distance, shot_cooldown, rotation_speed, travel_speed: f32,
 ) -> BulletSpawner {
 	return BulletSpawner {
+		tag = tag,
 		position = source,
 		shot_count = shot_count,
 		wave_count = wave_count,
@@ -93,6 +112,7 @@ make_circle_spawner :: proc(
 
 spawner_shoot :: proc(spawner: ^BulletSpawner) {
 	make_shot_circle(
+		spawner.tag,
 		spawner.position,
 		spawner.shot_count,
 		spawner.distance,
@@ -124,7 +144,7 @@ update_bullets :: proc() {
 draw_bullets :: proc() {
 	for bullet in bullets {
 		pos := get_relative_position(bullet.position)
-		rl.DrawCircleV(pos, 8, bullet_control.bullet_color)
+		rl.DrawCircleV(pos, 8, bullet_control.bullet_color[bullet.tag][bullet_control.bullet_color_index])
 	}
 }
 
@@ -132,13 +152,9 @@ manage_bullet_color :: proc() {
 	bullet_control.bullet_progress += TICK_RATE
 	if bullet_control.bullet_progress > 0.1 {
 		bullet_control.bullet_progress = 0
-		switch bullet_control.bullet_color {
-		case rl.WHITE:
-			bullet_control.bullet_color = rl.RED
-		case rl.RED:
-			bullet_control.bullet_color = rl.BLUE
-		case rl.BLUE:
-			bullet_control.bullet_color = rl.WHITE
+		bullet_control.bullet_color_index += 1
+		if bullet_control.bullet_color_index > 2 {
+			bullet_control.bullet_color_index = 0
 		}
 	}
 }

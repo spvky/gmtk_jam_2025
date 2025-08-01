@@ -27,7 +27,11 @@ bullets: [dynamic]Bullet
 bullet_spawners: [dynamic]BulletSpawner
 
 bullet_control := BulletControl {
-	bullet_color = rl.WHITE,
+	bullet_color = {
+		.Player = {{118, 136, 169, 255}, {77, 100, 141, 255}, {21, 44, 85, 255}},
+		.Enemy = {{255, 170, 170, 255}, {212, 106, 106, 255}, {128, 21, 21, 255}},
+		.Ghost = {},
+	},
 }
 
 // temporary debug access
@@ -58,7 +62,6 @@ init :: proc() {
 		world.current_level = .Hub
 	}
 	rl.SetTargetFPS(60)
-
 }
 
 
@@ -123,7 +126,7 @@ playing :: proc() {
 	}
 
 	if rl.IsKeyPressed(.LEFT_CONTROL) {
-		spawner := make_circle_spawner(world.player.translation, 10, 5, 20, 0.05, 45, 50)
+		spawner := make_circle_spawner(.Player, world.player.translation, 10, 5, 20, 0.05, 45, 50)
 		append(&bullet_spawners, spawner)
 	}
 
