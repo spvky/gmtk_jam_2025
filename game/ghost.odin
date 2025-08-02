@@ -9,7 +9,7 @@ Ghost_Particle :: struct {
 	translation: Vec2,
 	velocity:    Vec2,
 	lifetime:    u16,
-	size:        u16,
+	size:        f32,
 }
 
 Ghost :: struct {
