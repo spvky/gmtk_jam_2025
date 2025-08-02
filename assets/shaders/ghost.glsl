@@ -26,6 +26,5 @@ void main() {
 
     vec4 color = texture2D(texture0, uv);
 
-	color = vec4(color.rgb * 0.07, color.a);
-    gl_FragColor = mix(color, ghost_color, glitch);
+    gl_FragColor = mix(vec4(color.rgb * 0.15, 1), ghost_color, glitch) * color.a;
 }
