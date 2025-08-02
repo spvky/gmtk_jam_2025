@@ -2,6 +2,7 @@ package game
 
 import "core:fmt"
 import "core:math"
+import l "core:math/linalg"
 import rl "vendor:raylib"
 
 Enemy :: struct {
@@ -14,7 +15,10 @@ Enemy :: struct {
 	spawned_tick:     u16,
 }
 
-SPAWN_TIME_TICKS :: 60
+SKELETON_ATTACK_RANGE_RADIUS_PX :: 8
+VAMPIRE_ATTACK_RANGE_RADIUS_PX :: 120
+
+MARCHING_STEPS :: 20
 
 EnemyTag :: enum {
 	Skeleton,
@@ -70,36 +74,84 @@ enemy_transition_state :: proc() {
 	}
 }
 
+raymarch :: proc(start: Vec2, end: Vec2) -> bool {
+	level := world.levels[world.current_level]
+	for i in 0 ..< MARCHING_STEPS {
+		distance := (end - start) * (f32(i) / f32(MARCHING_STEPS))
+		for tile in level.tiles {
+			if .Collision in tile.properties {
+				tile_rect: rl.Rectangle = {
+					x      = tile.position.x + TILE_SIZE,
+					y      = tile.position.y + TILE_SIZE,
+					width  = TILE_SIZE,
+					height = TILE_SIZE,
+				}
+				if rl.CheckCollisionPointRec(start + distance, tile_rect) {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+should_enemy_be_attacking :: proc(enemy: Enemy) -> bool {
+	switch enemy.tag {
+	case .Skeleton:
+		return l.distance(enemy.position, world.player.translation) < SKELETON_ATTACK_RANGE_RADIUS_PX
+	case .Vampire:
+		if l.distance(enemy.position, world.player.translation) < VAMPIRE_ATTACK_RANGE_RADIUS_PX {
+			return !raymarch(enemy.position, world.player.translation)
+		}
+	}
+	return false
+}
+
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
 	for &enemy in enemies {
 		animate_enemy(&enemy)
 
-		if enemy.state == .Spawning {
+		switch enemy.state {
+		case .Spawning:
 			if enemy.animation_player.current_frame == enemy.animation_player.current_animation.end {
-				enemy.state = .Idle
+				enemy.state = .Movement
 			}
 
 			continue
+		case .Idle:
+			if should_enemy_be_attacking(enemy) {
+				enemy.state = .Attack
+			}
+		case .Movement:
+			if should_enemy_be_attacking(enemy) {
+				enemy.state = .Attack
+			}
+
+			grid_position := (enemy.position / TILE_SIZE)
+
+			grid_source_pos: [2]int = {int(math.floor(grid_position.x)), int(math.floor(grid_position.y))}
+			// if we are moving upwards we want to wait until we are 'leaving' the square
+			// until we source the new flow field instruction
+			// otherwise, we get weird behaviour because as we barely cross the coordinate border from 1.0 to 0.99
+			// we will now use the instruction at 0. instead of 1, despite us being at the top part of 1, moving up towards 0.
+
+			if enemy.direction.x < 0 {
+				grid_source_pos.x = int(math.ceil(grid_position.x))
+			}
+			if enemy.direction.y < 0 {
+				grid_source_pos.y = int(math.ceil(grid_position.y))
+			}
+			direction := flow_field[grid_source_pos.y][grid_source_pos.x]
+			enemy.position += direction
+			enemy.direction = direction
+
+		case .Attack:
+			if enemy.animation_player.current_frame == enemy.animation_player.current_animation.end {
+				enemy.state = .Movement
+			}
+		case .Die:
 		}
-
-		grid_position := (enemy.position / TILE_SIZE)
-
-		grid_source_pos: [2]int = {int(math.floor(grid_position.x)), int(math.floor(grid_position.y))}
-		// if we are moving upwards we want to wait until we are 'leaving' the square
-		// until we source the new flow field instruction
-		// otherwise, we get weird behaviour because as we barely cross the coordinate border from 1.0 to 0.99
-		// we will now use the instruction at 0. instead of 1, despite us being at the top part of 1, moving up towards 0.
-
-		if enemy.direction.x < 0 {
-			grid_source_pos.x = int(math.ceil(grid_position.x))
-		}
-		if enemy.direction.y < 0 {
-			grid_source_pos.y = int(math.ceil(grid_position.y))
-		}
-		direction := flow_field[grid_source_pos.y][grid_source_pos.x]
-		enemy.position += direction
-		enemy.direction = direction
-
 	}
 }
 
