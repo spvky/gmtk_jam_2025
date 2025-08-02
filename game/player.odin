@@ -199,10 +199,18 @@ spawn_player :: proc(player: ^Player, level: Level) {
 	player.translation = get_spawn_point(level)
 }
 
-kill_player :: proc(world: ^World) {
+kill_player :: proc() {
+	clear_dynamic_collections()
 	level := world.levels[world.current_level]
 	world.current_level = .Hub
-	level = world.levels[world.current_level]
-	spawn_player(&world.player, level)
+	world.player.translation = get_spawn_point(level)
+	hard_reset_loop()
+}
+
+player_wins_wave :: proc() {
+	clear_dynamic_collections()
+	level := world.levels[world.current_level]
+	world.current_level = .Hub
+	world.player.translation = get_spawn_point(level)
 	reset_loop()
 }

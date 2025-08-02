@@ -20,6 +20,10 @@ Ghost :: struct {
 
 delay :: 120
 
+make_ghost :: proc(translation: Vec2) -> Ghost {
+	return Ghost{translation = translation}
+}
+
 ghost_shoot :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
 	translation := ghost.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
 	spawner: BulletSpawner
@@ -82,8 +86,7 @@ update_ghosts :: proc() {
 
 	for i in 0 ..< len(ghosts) {
 		ghost := &ghosts[i]
-		apply_ghost_inputs(ghost, input_streams[i][world.current_tick - delay], player_attributes[i])
-		//apply_ghost_inputs(ghost, input_streams[i + 1][world.current_tick - delay])
+		apply_ghost_inputs(ghost, input_streams[i + 1][world.current_tick - delay], player_attributes[i])
 
 
 		i := len(ghost.particles) - 1

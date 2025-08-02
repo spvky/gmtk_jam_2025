@@ -245,7 +245,7 @@ handle_triggers :: proc(world: ^World) {
 		case .Next_Level:
 			world.current_level = .Level
 			level = world.levels[world.current_level]
-			spawn_player(player, level)
+			spawn_player_and_ghosts()
 		}
 	}
 }

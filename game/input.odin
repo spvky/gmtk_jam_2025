@@ -135,7 +135,7 @@ write_input_to_stream :: proc() {
 }
 
 make_input_streams :: proc() -> [dynamic]InputStream {
-	return make([dynamic]InputStream, 2, 8)
+	return make([dynamic]InputStream, 1, 8)
 }
 
 destroy_input_streams :: proc() {

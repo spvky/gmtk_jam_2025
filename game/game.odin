@@ -74,9 +74,19 @@ init :: proc() {
 	rl.SetTargetFPS(60)
 
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
-	append(&ghosts, Ghost{})
 
 	init_waves()
+}
+
+spawn_player_and_ghosts :: proc() {
+	spawn_point := get_spawn_point(world.levels[world.current_level])
+	world.player.translation = spawn_point
+	inputs_length := len(input_streams)
+	if inputs_length > 1 {
+		for i in 1 ..< inputs_length {
+			append(&ghosts, make_ghost(spawn_point))
+		}
+	}
 }
 
 
@@ -94,13 +104,13 @@ update :: proc() {
 draw :: proc() {
 	rl.BeginTextureMode(screen_texture)
 	rl.ClearBackground(rl.BLACK)
-	display_clock()
 	draw_tiles(world.levels[world.current_level], tilesheet, .Structure)
 	draw_tiles(world.levels[world.current_level], tilesheet, .Decor)
 	render_players()
 	draw_enemies()
 	draw_bullets()
 	draw_ghosts()
+	display_clock()
 	rl.EndTextureMode()
 
 
@@ -146,7 +156,7 @@ playing :: proc() {
 		world.current_tick += 1
 		world.simulation_time -= TICK_RATE
 		if rl.IsKeyPressed(.END) {
-			kill_player(&world)
+			player_wins_wave()
 		}
 
 
@@ -169,8 +179,7 @@ playing :: proc() {
 			flow_field = pathfinding.generate_flow_field(cost_map, cells)
 
 			if world.current_tick >= TIME_LIMIT {
-				kill_player(&world)
-				clear(&enemies)
+				player_wins_wave()
 				return
 			}
 
@@ -185,6 +194,13 @@ playing :: proc() {
 
 	handle_triggers(&world)
 
+}
+
+clear_dynamic_collections :: proc() {
+	clear(&bullet_spawners)
+	clear(&bullets)
+	clear(&ghosts)
+	clear(&enemies)
 }
 
 shutdown :: proc() {
