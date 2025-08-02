@@ -55,13 +55,14 @@ render_players :: proc() {
 player_shoot :: proc() {
 	player := &world.player
 	input := world.current_input_tick
+	translation := player.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
 	if .Shoot in input.buttons {
 		spawner: BulletSpawner
 		switch player.shot_type {
 		case .Normal:
 			spawner = make_arc_spawner(
 				tag = .Player,
-				source = player.translation,
+				source = translation,
 				shot_count = player.shot_amount,
 				wave_count = player.shot_iterations,
 				distance = 8,
@@ -73,7 +74,7 @@ player_shoot :: proc() {
 		case .Spiral:
 			spawner = make_circle_spawner(
 				tag = .Player,
-				source = player.translation,
+				source = translation,
 				shot_count = player.shot_amount,
 				wave_count = player.shot_iterations,
 				distance = 8,
@@ -84,7 +85,7 @@ player_shoot :: proc() {
 		case .Orbital:
 			spawner = make_orbital_spawner(
 				tag = .Player,
-				source = player.translation,
+				source = translation,
 				shot_count = player.shot_amount,
 				wave_count = player.shot_iterations,
 				distance = 8,
