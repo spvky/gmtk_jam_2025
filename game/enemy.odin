@@ -14,6 +14,7 @@ Enemy :: struct {
 	prev_state:       EnemyState,
 	spawned_tick:     u16,
 	damaged_timer:    f32,
+	health:           u8,
 }
 
 ENEMY_DAMAGE_TIME :: 0.3
@@ -48,6 +49,14 @@ EnemyState :: enum {
 
 make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 	enemy: Enemy
+	health_val: u8
+
+	switch tag {
+	case .Skeleton:
+		health_val = 5
+	case .Vampire:
+		health_val = 3
+	}
 
 	return Enemy {
 		tag = tag,
@@ -61,6 +70,7 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 		state = .Spawning,
 		position = position,
 		spawned_tick = world.current_tick,
+		health = health_val,
 	}
 }
 

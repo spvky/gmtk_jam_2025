@@ -1,8 +1,11 @@
 package game
 
+import "core:fmt"
 import m "core:math"
 import l "core:math/linalg"
 import rl "vendor:raylib"
+
+BULLET_RADIUS :: 3
 
 BulletControl :: struct {
 	bullet_progress:    f32,
@@ -251,12 +254,72 @@ update_bullets :: proc() {
 	manage_bullet_spawners()
 	manage_bullet_color()
 	manage_bullet_path()
+	check_bullet_collision()
 }
+
+check_bullet_collision :: proc() {
+	to_remove: [dynamic]int
+
+	fmt.println(len(bullets))
+
+	for &bullet, i in bullets {
+
+		has_collided := false
+
+		switch bullet.tag {
+		case .Player:
+			for &enemy, i_en in enemies {
+				if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, enemy.position, 8) && !has_collided {
+					has_collided = true
+					enemy.health -= 1
+					enemy.damaged_timer = ENEMY_DAMAGE_TIME
+					append(&to_remove, i)
+
+
+				}
+			}
+
+		case .Enemy:
+			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) && !has_collided {
+				has_collided = true
+				world.player.health -= 1
+				append(&to_remove, i)
+			}
+
+		case .Ghost:
+			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) && !has_collided {
+				has_collided = true
+				kill_player()
+				append(&to_remove, i)
+			}
+		}
+
+		level := world.levels[world.current_level]
+		for tile in level.tiles {
+			if .Collision in tile.properties {
+
+				tile_rec := rl.Rectangle{tile.position[0], tile.position[1], TILE_SIZE, TILE_SIZE}
+				if rl.CheckCollisionCircleRec(bullet.position, BULLET_RADIUS, tile_rec) {
+					has_collided = true
+					append(&to_remove, i)
+				}
+
+			}
+		}
+
+	}
+
+	for i in to_remove {
+		unordered_remove(&bullets, i)
+		clear(&to_remove)
+	}
+}
+
 
 draw_bullets :: proc() {
 	for bullet in bullets {
 		pos := get_relative_position(bullet.position)
-		rl.DrawCircleV(pos, 3, bullet_control.bullet_color[bullet.tag][bullet_control.bullet_color_index])
+		rl.DrawCircleV(pos, BULLET_RADIUS, bullet_control.bullet_color[bullet.tag][bullet_control.bullet_color_index])
 	}
 }
 

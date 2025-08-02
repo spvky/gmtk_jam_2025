@@ -14,6 +14,7 @@ Player :: struct {
 	using attributes:       PlayerAttributes,
 	animation_player:       AnimationPlayer,
 	player_animation_state: PlayerAnimationState,
+	health:                 u8,
 }
 
 PlayerAttributes :: struct {
@@ -73,6 +74,7 @@ make_player :: proc() -> Player {
 			current_animation = character_animations[chosen_character][.Idle],
 			current_frame = character_animations[chosen_character][.Idle].start,
 		},
+		health = 3,
 	}
 }
 

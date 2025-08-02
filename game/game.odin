@@ -149,6 +149,11 @@ playing :: proc() {
 	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
 
 
+	if world.current_level == .Level {
+
+		player_shoot()
+	}
+
 	world.simulation_time += rl.GetFrameTime()
 	for world.simulation_time >= TICK_RATE {
 		read_input(relative_mouse_rotation)
@@ -168,7 +173,6 @@ playing :: proc() {
 
 		if world.current_level == .Level {
 
-			player_shoot()
 
 			// these can be update technically only when moving, if we want to limit the calls
 			// or / also at only certain intervals if we want
