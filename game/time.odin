@@ -21,6 +21,7 @@ reset_loop :: proc() {
 
 start_new_loop :: proc() {
 	inject_at_elem(&input_streams, 0, InputStream{})
+	inject_at_elem(&player_attributes, 0, world.player.attributes)
 	for i in 0 ..= world.loop_number {
 	}
 	when ODIN_DEBUG {

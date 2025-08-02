@@ -20,7 +20,51 @@ Ghost :: struct {
 
 delay :: 120
 
-apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick) {
+ghost_shoot :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
+	translation := ghost.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
+	spawner: BulletSpawner
+	switch player.shot_type {
+	case .Normal:
+		spawner = make_arc_spawner(
+			tag = .Ghost,
+			source = translation,
+			shot_count = player.shot_amount,
+			wave_count = player.shot_iterations,
+			distance = 8,
+			shot_cooldown = 0.05,
+			angle = input.mouse_rotation,
+			arc = player.shot_spread,
+			speed = player.shot_speed,
+		)
+	case .Spiral:
+		spawner = make_circle_spawner(
+			tag = .Ghost,
+			source = translation,
+			shot_count = player.shot_amount,
+			wave_count = player.shot_iterations,
+			distance = 8,
+			shot_cooldown = 0.05,
+			rotation_speed = 360,
+			travel_speed = 75,
+		)
+	case .Orbital:
+		spawner = make_orbital_spawner(
+			tag = .Ghost,
+			source = translation,
+			shot_count = player.shot_amount,
+			wave_count = player.shot_iterations,
+			distance = 8,
+			shot_cooldown = 0.05,
+			angle = input.mouse_rotation,
+			speed = player.shot_speed,
+			radius = 10,
+			rotation_speed = 720,
+		)
+	}
+	append(&bullet_spawners, spawner)
+}
+
+apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
 	new_velo := direction_to_vec(input.direction)
 	ghost.velocity = new_velo * PLAYER_MOVESPEED
 
@@ -28,7 +72,7 @@ apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick) {
 	ghost.translation += ghost.velocity * TICK_RATE
 
 	if .Shoot in input.buttons {
-		append(&bullets, Bullet{.Ghost, StraightPath{input.mouse_rotation, 160, 22.5}, ghost.translation, 0, 20})
+		ghost_shoot(ghost, input, player)
 	}
 }
 
@@ -40,7 +84,7 @@ update_ghosts :: proc() {
 
 	for i in 0 ..< len(ghosts) {
 		ghost := &ghosts[i]
-		apply_ghost_inputs(ghost, input_streams[i][world.current_tick - delay])
+		apply_ghost_inputs(ghost, input_streams[i][world.current_tick - delay], player_attributes[i])
 		//apply_ghost_inputs(ghost, input_streams[i + 1][world.current_tick - delay])
 
 

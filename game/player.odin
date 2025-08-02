@@ -11,15 +11,22 @@ Player :: struct {
 	state:                  PlayerState,
 	translation:            Vec2,
 	velocity:               Vec2,
-	radius:                 f32,
-	dodge_cooldown:         f32,
-	shot_amount:            int,
-	shot_iterations:        int,
-	shot_spread:            f32,
-	shot_speed:             f32,
-	shot_type:              ShotType,
+	state:                  PlayerState,
+	translation:            Vec2,
+	velocity:               Vec2,
+	using attributes:       PlayerAttributes,
 	animation_player:       AnimationPlayer,
 	player_animation_state: PlayerAnimationState,
+}
+
+PlayerAttributes :: struct {
+	radius:          f32,
+	dodge_cooldown:  f32,
+	shot_amount:     int,
+	shot_iterations: int,
+	shot_spread:     f32,
+	shot_speed:      f32,
+	shot_type:       ShotType,
 }
 
 PlayerState :: union {
@@ -46,6 +53,15 @@ character_sheet: rl.Texture
 
 make_player :: proc() -> Player {
 	chosen_character: Character_Tag = .MiniNobleWoman
+	attributes := PlayerAttributes {
+		radius          = 8,
+		shot_type       = .Normal,
+		shot_amount     = 1,
+		shot_iterations = 1,
+		shot_speed      = 100,
+		shot_spread     = 22.5,
+	}
+	append(&player_attributes, attributes)
 	return Player {
 		radius = 8,
 		shot_type = .Normal,
@@ -188,8 +204,6 @@ spawn_player :: proc(player: ^Player, level: Level) {
 }
 
 kill_player :: proc(world: ^World) {
-	//TODO: death animation, death screen(?), transition
-
 	level := world.levels[world.current_level]
 	world.current_level = .Hub
 	level = world.levels[world.current_level]

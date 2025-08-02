@@ -13,6 +13,7 @@ Vec2 :: rl.Vector2
 world: World
 screen_texture: rl.RenderTexture
 input_streams: [dynamic]InputStream
+player_attributes: [dynamic]PlayerAttributes
 
 TICK_RATE :: 1.0 / 100.0
 WINDOW_WIDTH: i32
@@ -55,9 +56,13 @@ init :: proc() {
 	enemy_texture_atlas = make_enemy_texture_atlas()
 	character_texture_atlas = make_character_texture_atlas()
 	input_streams = make_input_streams()
+	player_attributes = make([dynamic]PlayerAttributes, 0, 8)
 	enemies = make([dynamic]Enemy, 0, 32)
 	bullets = make([dynamic]Bullet, 0, 128)
 	bullet_spawners = make([dynamic]BulletSpawner, 0, 16)
+	world = make_world()
+	enemy_texture_atlas = make_enemy_texture_atlas()
+	input_streams = make_input_streams()
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
