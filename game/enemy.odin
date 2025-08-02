@@ -13,8 +13,10 @@ Enemy :: struct {
 	state:            EnemyState,
 	prev_state:       EnemyState,
 	spawned_tick:     u16,
+	damaged_timer:    f32,
 }
 
+ENEMY_DAMAGE_TIME :: 0.3
 SKELETON_ATTACK_RANGE_RADIUS_PX :: 8
 VAMPIRE_ATTACK_RANGE_RADIUS_PX :: 120
 
@@ -110,6 +112,9 @@ should_enemy_be_attacking :: proc(enemy: Enemy) -> bool {
 
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
 	for &enemy in enemies {
+		if enemy.damaged_timer > 0 {
+			enemy.damaged_timer = math.clamp(enemy.damaged_timer - TICK_RATE, 0, ENEMY_DAMAGE_TIME)
+		}
 		animate_enemy(&enemy)
 
 		switch enemy.state {
@@ -204,6 +209,14 @@ draw_enemies :: proc() {
 		// rl.DrawRectangleV(relative_position, {16, 16}, rl.WHITE)
 
 		// drawing sprite at an odd offset to align the sprite with where they are in the world
-		rl.DrawTextureRec(enemy.animation_player.texture^, source_rect, relative_position - {4, 12}, rl.WHITE)
+		red := [4]f32{230, 41, 55, 255}
+		white := [4]f32{255, 255, 255, 255}
+		color := math.lerp(white, red, enemy.damaged_timer / ENEMY_DAMAGE_TIME)
+		rl.DrawTextureRec(
+			enemy.animation_player.texture^,
+			source_rect,
+			relative_position - {4, 12},
+			rl.Color{u8(color.r), u8(color.g), u8(color.b), u8(color.a)},
+		)
 	}
 }
