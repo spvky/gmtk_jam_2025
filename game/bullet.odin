@@ -39,12 +39,21 @@ BulletSpawner :: struct {
 BulletPath :: union #no_nil {
 	StraightPath,
 	SpiralPath,
+	WavePath,
 }
 
 StraightPath :: struct {
 	angle: f32,
 	speed: f32,
 	arc:   f32,
+}
+
+WavePath :: struct {
+	angle:      f32,
+	speed:      f32,
+	arc:        f32,
+	wave_speed: f32,
+	wave_depth: f32,
 }
 
 SpiralPath :: struct {
@@ -80,6 +89,15 @@ make_straight_bullet :: proc(tag: BulletTag, source: Vec2, angle: f32, speed: f3
 	return Bullet{tag = tag, position = source, path = StraightPath{angle = angle, speed = speed}, lifetime = 20}
 }
 
+make_wave_bullet :: proc(tag: BulletTag, source: Vec2, angle, speed, wave_speed, wave_depth: f32) -> Bullet {
+	return Bullet {
+		tag = tag,
+		position = source,
+		path = WavePath{angle = angle, speed = speed, wave_speed = wave_speed, wave_depth = wave_depth},
+		lifetime = 20,
+	}
+}
+
 make_arc_shot :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32, speed: f32 = 160) {
 	if amount > 1 {
 		min_angle := l.to_degrees(angle) - arc / 2
@@ -105,6 +123,20 @@ make_spiral_shot :: proc(
 	for i in 0 ..= shot_count {
 		angle := f32(i) * angle_between
 		append(&bullets, make_spiral_bullet(tag, source, angle, distance, spread_speed, rotation_speed))
+	}
+}
+
+make_wave_shot :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32, speed: f32 = 160) {
+	if amount > 1 {
+		min_angle := l.to_degrees(angle) - arc / 2
+		arc_increment := arc / f32(amount)
+
+		for i in 0 ..= amount {
+			shot_angle := min_angle + (f32(i) * arc_increment)
+			append(&bullets, make_wave_bullet(tag, source, l.to_radians(shot_angle), speed, 10, 20))
+		}
+	} else {
+		append(&bullets, make_wave_bullet(tag, source, angle, speed, 10, 20))
 	}
 }
 
@@ -159,6 +191,8 @@ spawner_shoot :: proc(spawner: ^BulletSpawner) {
 		)
 	case StraightPath:
 		make_arc_shot(spawner.tag, spawner.position, path.angle, spawner.shot_count, path.arc, path.speed)
+	case WavePath:
+		make_wave_shot(spawner.tag, spawner.position, path.angle, spawner.shot_count, path.arc, path.speed)
 	}
 
 	spawner.waves_fired += 1
@@ -212,6 +246,14 @@ manage_bullet_path :: proc() {
 			bullet.position.y = path.anchor.y + path.current_radius * m.sin(path.current_angle)
 			path.current_radius += path.travel_speed * TICK_RATE
 			path.current_angle += l.to_radians(path.rotation_speed) * TICK_RATE
+		case WavePath:
+			direction := l.normalize(
+				Vec2 {
+					m.cos(path.angle) * (m.sin(bullet.current_life * path.wave_speed) * path.wave_depth),
+					m.sin(path.angle) * (m.cos(bullet.current_life * path.wave_speed) * path.wave_depth),
+				},
+			)
+			bullet.position += direction * path.speed * TICK_RATE
 		}
 		bullet.current_life += TICK_RATE
 		if bullet.current_life > bullet.lifetime {

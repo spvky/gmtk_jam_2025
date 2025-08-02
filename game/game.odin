@@ -138,7 +138,7 @@ playing :: proc() {
 
 	input := world.current_input_tick
 	if .Shoot in input.buttons {
-		make_arc_shot(
+		make_wave_shot(
 			.Player,
 			world.player.translation,
 			input.mouse_rotation,
