@@ -120,16 +120,6 @@ playing :: proc() {
 
 	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
 	read_input(relative_mouse_rotation)
-	t1 := f32(rl.GetTime())
-	elapsed := math.min(t1 - world.loop_time, 0.25)
-	world.loop_time = t1
-	world.simulation_time += elapsed
-	for world.simulation_time >= TICK_RATE {
-		write_input_to_stream()
-		physics_step()
-		world.current_tick += 1
-		world.simulation_time -= TICK_RATE
-	}
 
 	if rl.IsKeyPressed(.R) {
 		reset_loop()
@@ -155,6 +145,23 @@ playing :: proc() {
 	enemy_transition_state()
 
 
+	t1 := f32(rl.GetTime())
+	elapsed := math.min(t1 - world.loop_time, 0.25)
+	world.loop_time = t1
+	world.simulation_time += elapsed
+	for world.simulation_time >= TICK_RATE {
+		write_input_to_stream()
+		physics_step()
+		world.current_tick += 1
+		world.simulation_time -= TICK_RATE
+	}
+
+	if world.current_tick >= 1000 {
+		kill_player(&world)
+		reset_loop()
+		fmt.printfln("%v", world.loop_time)
+	}
+
 	u_time := f32(rl.GetTime())
 
 	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
@@ -165,6 +172,7 @@ playing :: proc() {
 	if wave, ok := waves[world.loop_number][world.current_tick].?; ok {
 		spawn_wave(wave, level)
 	}
+
 }
 
 shutdown :: proc() {
