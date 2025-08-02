@@ -208,4 +208,5 @@ kill_player :: proc(world: ^World) {
 	world.current_level = .Hub
 	level = world.levels[world.current_level]
 	spawn_player(&world.player, level)
+	reset_loop()
 }

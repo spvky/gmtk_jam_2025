@@ -128,7 +128,7 @@ update_enemies :: proc(flow_field: [][]rl.Vector2) {
 				enemy.state = .Attack
 			}
 
-			grid_position := (enemy.position / TILE_SIZE)
+			grid_position := ((enemy.position - world.levels[world.current_level].position) / TILE_SIZE)
 
 			grid_source_pos: [2]int = {int(math.floor(grid_position.x)), int(math.floor(grid_position.y))}
 			// if we are moving upwards we want to wait until we are 'leaving' the square

@@ -44,7 +44,7 @@ direction_to_vec :: proc(dir: Direction) -> Vec2 {
 	return vec
 }
 
-InputStream :: [10_000]InputTick
+InputStream :: [TIME_LIMIT]InputTick
 
 
 InputTick :: struct {

@@ -20,7 +20,7 @@ WINDOW_WIDTH: i32
 WINDOW_HEIGHT: i32
 SCREEN_WIDTH :: 800
 SCREEN_HEIGHT :: 450
-TIME_LIMIT :: 1000.
+TIME_LIMIT :: 10000
 run := true
 
 //temp enemy
@@ -129,23 +129,14 @@ playing :: proc() {
 	}
 
 	input := world.current_input_tick
-	player_shoot()
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
 	update_camera_position(target_position)
 
-	// these can be update technically only when moving, if we want to limit the calls
-	// or / also at only certain intervals if we want
-	cells := level.cell_grid
 
-	grid_position := (world.player.translation - level.position) / TILE_SIZE
+	u_time := f32(rl.GetTime())
 
-	cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
-	flow_field = pathfinding.generate_flow_field(cost_map, cells)
-
-	handle_triggers(&world)
-	update_enemies(flow_field)
-	enemy_transition_state()
+	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
 
 
 	world.simulation_time += rl.GetFrameTime()
@@ -154,23 +145,45 @@ playing :: proc() {
 		physics_step()
 		world.current_tick += 1
 		world.simulation_time -= TICK_RATE
+		if rl.IsKeyPressed(.END) {
+			kill_player(&world)
+		}
+
+
+		if world.current_level == .Hub {
+
+			world.current_tick = 0
+		}
+
+		if world.current_level == .Level {
+
+			player_shoot()
+
+			// these can be update technically only when moving, if we want to limit the calls
+			// or / also at only certain intervals if we want
+			cells := level.cell_grid
+
+			grid_position := (world.player.translation - level.position) / TILE_SIZE
+
+			cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
+			flow_field = pathfinding.generate_flow_field(cost_map, cells)
+
+			if world.current_tick >= TIME_LIMIT {
+				kill_player(&world)
+				clear(&enemies)
+				return
+			}
+
+			if wave, ok := waves[world.loop_number][world.current_tick].?; ok {
+				spawn_wave(wave, level)
+			}
+
+			update_enemies(flow_field)
+			enemy_transition_state()
+		}
 	}
 
-	if world.current_tick >= TIME_LIMIT {
-		kill_player(&world)
-		reset_loop()
-	}
-
-	u_time := f32(rl.GetTime())
-
-	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
-	if rl.IsKeyPressed(.END) {
-		kill_player(&world)
-	}
-
-	if wave, ok := waves[world.loop_number][world.current_tick].?; ok {
-		spawn_wave(wave, level)
-	}
+	handle_triggers(&world)
 
 }
 

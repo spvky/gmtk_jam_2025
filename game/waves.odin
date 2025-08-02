@@ -34,7 +34,7 @@ Wave :: struct {
 }
 
 // [loop]  [game tick]
-Waves :: [8][10_000]Maybe(Wave)
+Waves :: [8][TIME_LIMIT]Maybe(Wave)
 waves: Waves
 init_waves :: proc() {
 	// first loop
@@ -70,13 +70,13 @@ spawn_wave :: proc(wave: Wave, level: Level) {
 		for i in 0 ..< amount {
 			angle := f32(i) / f32(amount) * (math.PI * 2)
 			offset: Vec2 = {math.cos(angle), math.sin(angle)} * kind.radius
-			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset - level.position))
+			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset + level.position))
 		}
 	case Wave_Circle:
 		for i in 0 ..< amount {
 			angle := f32(i) / f32(amount) * (math.PI * 2)
 			offset: Vec2 = {math.cos(angle), math.sin(angle)} * kind.radius
-			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset - level.position))
+			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset + level.position))
 		}
 	case Wave_Line:
 		for i in 0 ..< amount {
@@ -84,7 +84,7 @@ spawn_wave :: proc(wave: Wave, level: Level) {
 				&enemies,
 				make_enemy(
 					wave.enemy_type,
-					kind.start + (kind.end - kind.start) * (f32(i) / f32(amount)) - level.position,
+					kind.start + (kind.end - kind.start) * (f32(i) / f32(amount)) + level.position,
 				),
 			)
 		}
