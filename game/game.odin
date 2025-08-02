@@ -19,6 +19,7 @@ WINDOW_WIDTH: i32
 WINDOW_HEIGHT: i32
 SCREEN_WIDTH :: 800
 SCREEN_HEIGHT :: 450
+TIME_LIMIT :: 1000.
 run := true
 
 //temp enemy
@@ -114,10 +115,6 @@ draw :: proc() {
 // Gameplay Code
 playing :: proc() {
 	level: Level = world.levels[world.current_level]
-	if !world.loop_timer_started {
-		world.loop_time = f32(rl.GetTime())
-		world.loop_timer_started = true
-	}
 
 	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
 	read_input(relative_mouse_rotation)
@@ -146,10 +143,7 @@ playing :: proc() {
 	enemy_transition_state()
 
 
-	t1 := f32(rl.GetTime())
-	elapsed := math.min(t1 - world.loop_time, 0.25)
-	world.loop_time = t1
-	world.simulation_time += elapsed
+	world.simulation_time += rl.GetFrameTime()
 	for world.simulation_time >= TICK_RATE {
 		write_input_to_stream()
 		physics_step()
@@ -157,10 +151,9 @@ playing :: proc() {
 		world.simulation_time -= TICK_RATE
 	}
 
-	if world.current_tick >= 1000 {
+	if world.current_tick >= TIME_LIMIT {
 		kill_player(&world)
 		reset_loop()
-		fmt.printfln("%v", world.loop_time)
 	}
 
 	u_time := f32(rl.GetTime())
