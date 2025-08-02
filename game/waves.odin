@@ -55,6 +55,12 @@ init_waves :: proc() {
 		amount = 8,
 		enemy_type = .Vampire,
 	}
+
+	waves[0][160] = Wave {
+		kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+		amount = 10,
+		enemy_type = .Skeleton,
+	}
 }
 
 spawn_wave :: proc(wave: Wave, level: Level) {

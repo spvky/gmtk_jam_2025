@@ -51,7 +51,7 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 			current_animation = enemy_animations[tag][.Idle],
 			current_frame = enemy_animations[tag][.Idle].start,
 		},
-		prev_state = .Spawning,
+		prev_state = .Idle,
 		state = .Spawning,
 		position = position,
 		spawned_tick = world.current_tick,
@@ -72,6 +72,16 @@ enemy_transition_state :: proc() {
 
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
 	for &enemy in enemies {
+		animate_enemy(&enemy)
+
+		if enemy.state == .Spawning {
+			if enemy.animation_player.current_frame == enemy.animation_player.current_animation.end {
+				enemy.state = .Idle
+			}
+
+			continue
+		}
+
 		grid_position := (enemy.position / TILE_SIZE)
 
 		grid_source_pos: [2]int = {int(math.floor(grid_position.x)), int(math.floor(grid_position.y))}
@@ -89,13 +99,7 @@ update_enemies :: proc(flow_field: [][]rl.Vector2) {
 		direction := flow_field[grid_source_pos.y][grid_source_pos.x]
 		enemy.position += direction
 		enemy.direction = direction
-		animate_enemy(&enemy)
 
-		if enemy.state == .Spawning {
-			if world.current_tick >= enemy.spawned_tick + SPAWN_TIME_TICKS {
-				enemy.state = .Idle
-			}
-		}
 	}
 }
 
@@ -129,7 +133,6 @@ enemy_attack :: proc(enemy: ^Enemy) {
 
 draw_enemies :: proc() {
 	for enemy in enemies {
-		if enemy.state == .Spawning {continue} 	// TODO
 		relative_position := get_relative_position(enemy.position)
 		current_frame := enemy.animation_player.current_frame
 		x_position := f32(current_frame % 9) * 32
