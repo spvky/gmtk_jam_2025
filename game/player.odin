@@ -8,13 +8,16 @@ PLAYER_MOVESPEED :: 100
 PLAYER_ROLL_DISTANCE :: 100
 
 Player :: struct {
-	state:          PlayerState,
-	translation:    Vec2,
-	velocity:       Vec2,
-	radius:         f32,
-	dodge_cooldown: f32,
-	shot_amount:    int,
-	shot_spread:    f32,
+	state:           PlayerState,
+	translation:     Vec2,
+	velocity:        Vec2,
+	radius:          f32,
+	dodge_cooldown:  f32,
+	shot_amount:     int,
+	shot_iterations: int,
+	shot_spread:     f32,
+	shot_speed:      f32,
+	shot_type:       ShotType,
 }
 
 PlayerState :: union {
@@ -30,7 +33,15 @@ PlayerDodging :: struct {
 }
 
 make_player :: proc() -> Player {
-	return Player{radius = 8, state = PlayerMoving{}, shot_amount = 1, shot_spread = 22.5}
+	return Player {
+		radius = 8,
+		shot_type = .Normal,
+		state = PlayerMoving{},
+		shot_amount = 1,
+		shot_iterations = 1,
+		shot_speed = 100,
+		shot_spread = 22.5,
+	}
 }
 
 render_players :: proc() {
@@ -39,6 +50,54 @@ render_players :: proc() {
 
 	relative_position := get_relative_position(player.translation)
 	rl.DrawRectangleV(relative_position, {player.radius * 2, player.radius * 2}, color)
+}
+
+player_shoot :: proc() {
+	player := &world.player
+	input := world.current_input_tick
+	if .Shoot in input.buttons {
+		spawner: BulletSpawner
+		switch player.shot_type {
+		case .Normal:
+			spawner = make_arc_spawner(
+				tag = .Player,
+				source = player.translation,
+				shot_count = player.shot_amount,
+				wave_count = player.shot_iterations,
+				distance = 8,
+				shot_cooldown = 0.05,
+				angle = input.mouse_rotation,
+				arc = player.shot_spread,
+				speed = player.shot_speed,
+			)
+		case .Spiral:
+			spawner = make_circle_spawner(
+				tag = .Player,
+				source = player.translation,
+				shot_count = player.shot_amount,
+				wave_count = player.shot_iterations,
+				distance = 8,
+				shot_cooldown = 0.05,
+				rotation_speed = 360,
+				travel_speed = 75,
+			)
+		case .Orbital:
+			spawner = make_orbital_spawner(
+				tag = .Player,
+				source = player.translation,
+				shot_count = player.shot_amount,
+				wave_count = player.shot_iterations,
+				distance = 8,
+				shot_cooldown = 0.05,
+				angle = input.mouse_rotation,
+				speed = 100,
+				radius = 10,
+				rotation_speed = 720,
+			)
+		}
+
+		append(&bullet_spawners, spawner)
+	}
 }
 
 player_dodge :: proc() {

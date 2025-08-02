@@ -135,25 +135,8 @@ playing :: proc() {
 		reset_loop()
 	}
 
-
 	input := world.current_input_tick
-	if .Shoot in input.buttons {
-		spawner := make_orbital_spawner(
-			.Player,
-			world.player.translation,
-			3,
-			5,
-			5,
-			0.025,
-			input.mouse_rotation,
-			80,
-			10,
-			720,
-		)
-		// make_orbital_shot(.Player, world.player.translation, 3, input.mouse_rotation, 10, 120, 720)
-		append(&bullet_spawners, spawner)
-		// append(&bullets, make_orbital_bullet(.Player, world.player.translation, input.mouse_rotation, 160, 90, 5, 720))
-	}
+	player_shoot()
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
 	update_camera_position(target_position)

@@ -16,6 +16,12 @@ BulletTag :: enum {
 	Ghost,
 }
 
+ShotType :: enum {
+	Normal,
+	Spiral,
+	Orbital,
+}
+
 Bullet :: struct {
 	tag:          BulletTag,
 	path:         BulletPath,
@@ -65,52 +71,6 @@ OrbitalPath :: struct {
 	rotation_speed: f32,
 }
 
-make_straight_bullet :: proc(tag: BulletTag, source: Vec2, angle: f32, speed: f32) -> Bullet {
-	return Bullet{tag = tag, position = source, path = StraightPath{angle = angle, speed = speed}, lifetime = 20}
-}
-
-make_spiral_bullet :: proc(
-	tag: BulletTag,
-	anchor: Vec2,
-	starting_angle: f32,
-	starting_radius: f32,
-	travel_speed: f32,
-	rotation_speed: f32,
-) -> Bullet {
-	return Bullet {
-		tag = tag,
-		position = anchor,
-		path = SpiralPath {
-			anchor = anchor,
-			current_angle = l.to_radians(starting_angle),
-			current_radius = starting_radius,
-			travel_speed = travel_speed,
-			rotation_speed = rotation_speed,
-		},
-		lifetime = 10,
-	}
-}
-
-make_orbital_bullet :: proc(
-	tag: BulletTag,
-	anchor: Vec2,
-	angle, speed, radius, starting_angle, rotation_speed: f32,
-) -> Bullet {
-	return Bullet {
-		tag = tag,
-		position = anchor,
-		path = OrbitalPath {
-			anchor = anchor,
-			angle = angle,
-			speed = speed,
-			current_angle = l.to_radians(starting_angle),
-			radius = radius,
-			rotation_speed = rotation_speed,
-		},
-		lifetime = 10,
-	}
-}
-
 make_arc_shot :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc: f32, speed: f32 = 160) {
 	if amount > 1 {
 		min_angle := l.to_degrees(angle) - arc / 2
@@ -118,10 +78,21 @@ make_arc_shot :: proc(tag: BulletTag, source: Vec2, angle: f32, amount: int, arc
 
 		for i in 0 ..= amount {
 			shot_angle := min_angle + (f32(i) * arc_increment)
-			append(&bullets, make_straight_bullet(tag, source, l.to_radians(shot_angle), speed))
+			append(
+				&bullets,
+				Bullet {
+					tag = tag,
+					position = source,
+					path = StraightPath{angle = l.to_radians(shot_angle), speed = speed},
+					lifetime = 20,
+				},
+			)
 		}
 	} else {
-		append(&bullets, make_straight_bullet(tag, source, angle, speed))
+		append(
+			&bullets,
+			Bullet{tag = tag, position = source, path = StraightPath{angle = angle, speed = speed}, lifetime = 20},
+		)
 	}
 }
 
@@ -130,12 +101,25 @@ make_spiral_shot :: proc(
 	source: Vec2,
 	shot_count: int,
 	distance: f32,
-	rotation_speed, spread_speed: f32,
+	rotation_speed, travel_speed: f32,
 ) {
 	angle_between := 360.0 / f32(shot_count)
 	for i in 0 ..= shot_count {
 		angle := f32(i) * angle_between
-		append(&bullets, make_spiral_bullet(tag, source, angle, distance, spread_speed, rotation_speed))
+		append(
+			&bullets,
+			Bullet {
+				tag = tag,
+				position = source,
+				path = SpiralPath {
+					anchor = source,
+					current_angle = l.to_radians(angle),
+					travel_speed = travel_speed,
+					rotation_speed = rotation_speed,
+				},
+				lifetime = 10,
+			},
+		)
 	}
 }
 
@@ -143,7 +127,22 @@ make_orbital_shot :: proc(tag: BulletTag, source: Vec2, amount: int, angle, radi
 	angle_between := 360.0 / f32(amount)
 	for i in 0 ..= amount {
 		starting_angle := f32(i) * angle_between
-		append(&bullets, make_orbital_bullet(tag, source, angle, speed, radius, starting_angle, rotation_speed))
+		append(
+			&bullets,
+			Bullet {
+				tag = tag,
+				position = source,
+				path = OrbitalPath {
+					anchor = source,
+					angle = angle,
+					speed = speed,
+					current_angle = l.to_radians(starting_angle),
+					radius = radius,
+					rotation_speed = rotation_speed,
+				},
+				lifetime = 10,
+			},
+		)
 	}
 }
 
@@ -230,7 +229,6 @@ spawner_shoot :: proc(spawner: ^BulletSpawner) {
 			path.speed,
 			path.rotation_speed,
 		)
-	// make_wave_shot(spawner.tag, spawner.position, path.angle, spawner.shot_count, path.arc, path.speed)
 	}
 
 	spawner.waves_fired += 1
