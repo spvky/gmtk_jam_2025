@@ -156,7 +156,10 @@ draw_ghosts :: proc() {
 		ghost := ghosts[i]
 		rl.BeginShaderMode(ghost_shader)
 		for particle in ghost.particles {
-			rl.DrawCircleV(get_relative_position(particle.translation), particle.size / 2, rl.WHITE)
+			particle_position := particle.translation
+			particle_position += {particle.size / 4, particle.size / 4}
+			particle_position += {12, 16}
+			rl.DrawCircleV(get_relative_position(particle_position), particle.size / 2, rl.BLANK)
 		}
 		// TODO actually animate ghost, instead of stealing from player
 
