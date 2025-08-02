@@ -224,7 +224,6 @@ check_triggers :: proc(level: Level, player: Player) -> Maybe(Entity_Type) {
 }
 
 handle_triggers :: proc(world: ^World) {
-
 	level := world.levels[world.current_level]
 	player := &world.player
 	player_rec := rl.Rectangle{player.translation[0], player.translation[1], TILE_SIZE, TILE_SIZE}
@@ -248,4 +247,10 @@ handle_triggers :: proc(world: ^World) {
 			spawn_player_and_ghosts()
 		}
 	}
+}
+
+
+current_spawn_point :: proc() -> Vec2 {
+	level := world.levels[world.current_level]
+	return get_spawn_point(level)
 }

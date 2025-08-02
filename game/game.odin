@@ -70,7 +70,7 @@ init :: proc() {
 		world.current_level = .Hub
 	}
 
-	spawn_player(&world.player, world.levels[world.current_level])
+	world.player.translation = current_spawn_point()
 	rl.SetTargetFPS(60)
 
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
@@ -82,6 +82,7 @@ spawn_player_and_ghosts :: proc() {
 	spawn_point := get_spawn_point(world.levels[world.current_level])
 	world.player.translation = spawn_point
 	inputs_length := len(input_streams)
+	fmt.printfln("Inputs Length: %v", inputs_length)
 	if inputs_length > 1 {
 		for i in 1 ..< inputs_length {
 			append(&ghosts, make_ghost(spawn_point))
@@ -206,7 +207,6 @@ clear_dynamic_collections :: proc() {
 shutdown :: proc() {
 	rl.UnloadRenderTexture(screen_texture)
 	rl.CloseWindow()
-	destroy_world()
 	destroy_input_streams()
 }
 
