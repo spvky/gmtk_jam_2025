@@ -71,7 +71,7 @@ ghost_shoot :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
 apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
 	ghost.velocity = input.direction
 	// TODO treat 'dodge roll'
-	ghost.translation += ghost.velocity * TICK_RATE
+	ghost.translation += ghost.velocity
 
 	if .Shoot in input.buttons {
 		ghost_shoot(ghost, input, player)
