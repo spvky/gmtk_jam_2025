@@ -107,7 +107,7 @@ make_spiral_shot :: proc(
 	rotation_speed, travel_speed: f32,
 ) {
 	angle_between := 360.0 / f32(shot_count)
-	for i in 0 ..= shot_count {
+	for i in 0 ..< shot_count {
 		angle := f32(i) * angle_between
 		append(
 			&bullets,
@@ -260,7 +260,6 @@ update_bullets :: proc() {
 check_bullet_collision :: proc() {
 	to_remove: [dynamic]int
 
-	fmt.println(len(bullets))
 
 	for &bullet, i in bullets {
 
@@ -268,10 +267,13 @@ check_bullet_collision :: proc() {
 
 		switch bullet.tag {
 		case .Player:
-			for &enemy, i_en in enemies {
+			for &enemy in enemies {
 				if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, enemy.position, 8) && !has_collided {
 					has_collided = true
-					enemy.health -= 1
+					if enemy.health > 0 {
+						enemy.health -= 1
+
+					}
 					enemy.damaged_timer = ENEMY_DAMAGE_TIME
 					append(&to_remove, i)
 
@@ -282,7 +284,9 @@ check_bullet_collision :: proc() {
 		case .Enemy:
 			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) && !has_collided {
 				has_collided = true
-				world.player.health -= 1
+				if world.player.health > 0 {
+					world.player.health -= 1
+				}
 				append(&to_remove, i)
 			}
 

@@ -37,7 +37,7 @@ Wave :: struct {
 Waves :: [8][TIME_LIMIT]Maybe(Wave)
 waves: Waves
 init_waves :: proc() {
-	// first loop
+	//first;loop
 	waves[0][60] = Wave {
 		kind       = Wave_Area{100, {200, 120}},
 		amount     = 16,

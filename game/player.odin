@@ -6,6 +6,7 @@ import rl "vendor:raylib"
 
 PLAYER_MOVESPEED :: 100
 PLAYER_ROLL_DISTANCE :: 100
+PLAYER_HEALTH :: 3
 
 Player :: struct {
 	state:                  PlayerState,
@@ -74,7 +75,7 @@ make_player :: proc() -> Player {
 			current_animation = character_animations[chosen_character][.Idle],
 			current_frame = character_animations[chosen_character][.Idle].start,
 		},
-		health = 3,
+		health = PLAYER_HEALTH,
 	}
 }
 
@@ -201,6 +202,7 @@ kill_player :: proc() {
 	clear_dynamic_collections()
 	world.current_level = .Hub
 	world.player.translation = current_spawn_point()
+	world.player.health = PLAYER_HEALTH
 	hard_reset_loop()
 }
 
@@ -208,5 +210,12 @@ player_wins_wave :: proc() {
 	clear_dynamic_collections()
 	world.current_level = .Hub
 	world.player.translation = current_spawn_point()
+	world.player.health = PLAYER_HEALTH
 	reset_loop()
+}
+
+check_player_health :: proc() {
+	if world.player.health == 0 {
+		kill_player()
+	}
 }

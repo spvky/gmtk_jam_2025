@@ -192,6 +192,7 @@ playing :: proc() {
 				spawn_wave(wave, level)
 			}
 
+			check_player_health()
 			update_enemies(flow_field)
 			enemy_transition_state()
 		}

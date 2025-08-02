@@ -127,6 +127,10 @@ update_enemies :: proc(flow_field: [][]rl.Vector2) {
 		}
 		animate_enemy(&enemy)
 
+		if enemy.health == 0 {
+			enemy.state = .Die
+		}
+
 		switch enemy.state {
 		case .Spawning:
 			if enemy.animation_player.current_frame == enemy.animation_player.current_animation.end {
@@ -183,7 +187,7 @@ animate_enemy :: proc(enemy: ^Enemy) {
 		}
 
 		anim.current_frame = new_frame
-		if new_frame == attack_frame {
+		if new_frame == attack_frame && anim.animation_progression == 0 {
 			enemy_attack(enemy)
 		}
 	}
