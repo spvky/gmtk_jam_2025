@@ -1,8 +1,8 @@
 package game
 
 import "core:math"
-
 import l "core:math/linalg"
+import "core:math/rand"
 import rl "vendor:raylib"
 
 Ghost_Particle :: struct {
@@ -112,13 +112,14 @@ update_ghosts :: proc() {
 			// offset by a varying amount in the x axis
 			initial_particle_position += {2 * math.cos(f32(world.current_tick)), 0}
 
+			particle_size := (rand.float32() * 3) + 3
 			append(
 				&ghost.particles,
 				Ghost_Particle {
 					velocity = inital_particle_velocity,
 					translation = initial_particle_position,
 					lifetime = 45,
-					size = 6,
+					size = particle_size,
 				},
 			)
 		}
@@ -155,11 +156,7 @@ draw_ghosts :: proc() {
 		ghost := ghosts[i]
 		rl.BeginShaderMode(ghost_shader)
 		for particle in ghost.particles {
-			rl.DrawRectangleV(
-				get_relative_position(particle.translation),
-				{f32(particle.size), f32(particle.size)},
-				rl.WHITE,
-			)
+			rl.DrawCircleV(get_relative_position(particle.translation), particle.size / 2, rl.WHITE)
 		}
 		// TODO actually animate ghost, instead of stealing from player
 
