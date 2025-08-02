@@ -148,13 +148,13 @@ player_dodge :: proc() {
 	player := &world.player
 	input := world.current_input_tick
 	should_dodge := .Roll in input.buttons
-	direction := direction_to_vec(input.direction)
+	direction := input.direction
 
 	if player.dodge_cooldown > 0 {
 		player.dodge_cooldown = clamp(player.dodge_cooldown - TICK_RATE, 0, player.dodge_cooldown)
 	}
 
-	if player.dodge_cooldown == 0 && should_dodge && input.direction != .Neutral {
+	if player.dodge_cooldown == 0 && should_dodge && input.direction != {0, 0} {
 		player.state = PlayerDodging {
 			target   = player.translation + (direction * PLAYER_ROLL_DISTANCE),
 			duration = 0.2,
@@ -177,15 +177,14 @@ player_dodge :: proc() {
 set_player_velocities :: proc() {
 	player := &world.player
 	input := world.current_input_tick
-	new_velo := direction_to_vec(input.direction)
-	player.velocity = new_velo * PLAYER_MOVESPEED
+	player.velocity = input.direction
 }
 
 apply_player_velocities :: proc() {
 	player := &world.player
 	switch &state in player.state {
 	case PlayerMoving:
-		player.translation += player.velocity * TICK_RATE
+		player.translation += player.velocity
 	case PlayerDodging:
 		state.progress += TICK_RATE
 		amount := clamp(state.progress / state.duration, 0, 1.0)

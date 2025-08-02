@@ -122,7 +122,6 @@ playing :: proc() {
 	level: Level = world.levels[world.current_level]
 
 	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
-	read_input(relative_mouse_rotation)
 
 	if rl.IsKeyPressed(.R) {
 		reset_loop()
@@ -141,6 +140,7 @@ playing :: proc() {
 
 	world.simulation_time += rl.GetFrameTime()
 	for world.simulation_time >= TICK_RATE {
+		read_input(relative_mouse_rotation)
 		write_input_to_stream()
 		physics_step()
 		world.current_tick += 1

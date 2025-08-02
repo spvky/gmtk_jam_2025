@@ -65,9 +65,7 @@ ghost_shoot :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
 }
 
 apply_ghost_inputs :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
-	new_velo := direction_to_vec(input.direction)
-	ghost.velocity = new_velo * PLAYER_MOVESPEED
-
+	ghost.velocity = input.direction
 	// TODO treat 'dodge roll'
 	ghost.translation += ghost.velocity * TICK_RATE
 

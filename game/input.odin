@@ -1,54 +1,19 @@
 package game
 
 import "core:math"
+import l "core:math/linalg"
 import rl "vendor:raylib"
 
+
+InputStream :: [TIME_LIMIT]InputTick
 
 Button :: enum u8 {
 	Shoot,
 	Roll,
 }
 
-Direction :: enum u8 {
-	Neutral,
-	Up,
-	Down,
-	Left,
-	Right,
-	UpLeft,
-	UpRight,
-	DownLeft,
-	DownRight,
-}
-
-direction_to_vec :: proc(dir: Direction) -> Vec2 {
-	vec: Vec2
-	#partial switch dir {
-	case .Up:
-		vec = {0, -1}
-	case .Down:
-		vec = {0, 1}
-	case .Left:
-		vec = {-1, 0}
-	case .Right:
-		vec = {1, 0}
-	case .UpLeft:
-		vec = {-0.707, -0.707}
-	case .UpRight:
-		vec = {0.707, -0.707}
-	case .DownLeft:
-		vec = {-0.707, 0.707}
-	case .DownRight:
-		vec = {0.707, 0.707}
-	}
-	return vec
-}
-
-InputStream :: [TIME_LIMIT]InputTick
-
-
 InputTick :: struct {
-	direction:      Direction,
+	direction:      Vec2,
 	buttons:        bit_set[Button],
 	mouse_rotation: f32,
 }
@@ -71,38 +36,81 @@ get_mouse_rotation :: proc(relative_position: rl.Vector2) -> f32 {
 
 
 read_input :: proc(mouse_rotation: f32) {
-	x, y: i8
-	direction := Direction.Neutral
+	direction: Vec2
 	if rl.IsKeyDown(.A) {
-		x -= 1
+		direction.x -= 1
 	}
 	if rl.IsKeyDown(.D) {
-		x += 1
+		direction.x += 1
 	}
 	if rl.IsKeyDown(.S) {
-		y += 1
+		direction.y += 1
 	}
 	if rl.IsKeyDown(.W) {
-		y -= 1
+		direction.y -= 1
 	}
 
-	switch true {
-	case x == -1 && y == 0:
-		direction = .Left
-	case x == 1 && y == 0:
-		direction = .Right
-	case x == 0 && y == 1:
-		direction = .Down
-	case x == 0 && y == -1:
-		direction = .Up
-	case x == -1 && y == -1:
-		direction = .UpLeft
-	case x == 1 && y == -1:
-		direction = .UpRight
-	case x == -1 && y == 1:
-		direction = .DownLeft
-	case x == 1 && y == 1:
-		direction = .DownRight
+	direction_normal := l.normalize0(direction) * PLAYER_MOVESPEED * TICK_RATE
+	level := world.levels[world.current_level]
+
+	player_position := world.player.translation
+	player_position += {12, 16}
+
+	if direction_normal.x != 0 {
+		check_player_position := player_position
+		check_player_position.x += direction_normal.x
+		for tile in level.tiles {
+			if !(.Collision in tile.properties) {continue}
+
+			player_collision_rect: rl.Rectangle = {
+				x      = check_player_position.x,
+				y      = check_player_position.y,
+				width  = 8,
+				height = 8,
+			}
+
+			abs_tile_position := tile.position + level.position
+			if rl.CheckCollisionRecs(
+				player_collision_rect,
+				{abs_tile_position.x, abs_tile_position.y, TILE_SIZE, TILE_SIZE},
+			) {
+				correction := abs_tile_position.x - player_position.x - 8
+				if direction_normal.x < 0 {
+					correction = abs_tile_position.x + 16 - player_position.x
+				}
+				direction_normal.x = correction
+				player_position.x += correction
+				break
+			}
+		}
+	}
+
+	if direction_normal.y != 0 {
+		check_player_position := player_position
+		check_player_position.y += direction_normal.y
+		for tile in level.tiles {
+			if !(.Collision in tile.properties) {continue}
+
+			player_collision_rect: rl.Rectangle = {
+				x      = check_player_position.x,
+				y      = check_player_position.y,
+				width  = 8,
+				height = 8,
+			}
+
+			abs_tile_position := tile.position + level.position
+			if rl.CheckCollisionRecs(
+				player_collision_rect,
+				{abs_tile_position.x, abs_tile_position.y, TILE_SIZE, TILE_SIZE},
+			) {
+				correction := abs_tile_position.y - player_position.y - 8
+				if direction_normal.y < 0 {
+					correction = abs_tile_position.y + 16 - player_position.y
+				}
+				direction_normal.y = correction
+				break
+			}
+		}
 	}
 
 	buttons: bit_set[Button]
@@ -115,7 +123,7 @@ read_input :: proc(mouse_rotation: f32) {
 	}
 
 	world.current_input_tick = InputTick {
-		direction      = direction,
+		direction      = direction_normal,
 		buttons        = buttons,
 		mouse_rotation = mouse_rotation,
 	}
