@@ -8,21 +8,27 @@ PLAYER_MOVESPEED :: 100
 PLAYER_ROLL_DISTANCE :: 100
 
 Player :: struct {
-	state:           PlayerState,
-	translation:     Vec2,
-	velocity:        Vec2,
-	radius:          f32,
-	dodge_cooldown:  f32,
-	shot_amount:     int,
-	shot_iterations: int,
-	shot_spread:     f32,
-	shot_speed:      f32,
-	shot_type:       ShotType,
+	state:                  PlayerState,
+	translation:            Vec2,
+	velocity:               Vec2,
+	radius:                 f32,
+	dodge_cooldown:         f32,
+	shot_amount:            int,
+	shot_iterations:        int,
+	shot_spread:            f32,
+	shot_speed:             f32,
+	shot_type:              ShotType,
+	animation_player:       AnimationPlayer,
+	player_animation_state: PlayerAnimationState,
 }
 
 PlayerState :: union {
 	PlayerMoving,
 	PlayerDodging,
+}
+PlayerAnimationState :: enum {
+	Idle,
+	Moving,
 }
 
 PlayerMoving :: struct {}
@@ -32,7 +38,14 @@ PlayerDodging :: struct {
 	progress: f32,
 }
 
+Character_Tag :: enum {
+	MiniNobleWoman,
+}
+
+character_sheet: rl.Texture
+
 make_player :: proc() -> Player {
+	chosen_character: Character_Tag = .MiniNobleWoman
 	return Player {
 		radius = 8,
 		shot_type = .Normal,
@@ -41,6 +54,12 @@ make_player :: proc() -> Player {
 		shot_iterations = 1,
 		shot_speed = 100,
 		shot_spread = 22.5,
+		animation_player = AnimationPlayer {
+			frame_length = 0.1,
+			texture = &character_texture_atlas[chosen_character],
+			current_animation = character_animations[chosen_character][.Idle],
+			current_frame = character_animations[chosen_character][.Idle].start,
+		},
 	}
 }
 
@@ -49,7 +68,18 @@ render_players :: proc() {
 	color := rl.BLUE
 
 	relative_position := get_relative_position(player.translation)
-	rl.DrawRectangleV(relative_position, {player.radius * 2, player.radius * 2}, color)
+	current_frame := player.animation_player.current_frame
+	x_position := f32(current_frame % 6) * 32
+	y_position := f32(current_frame / 6) * 32
+
+	source_rect := rl.Rectangle {
+		x      = x_position,
+		y      = y_position,
+		width  = 32,
+		height = 32,
+	}
+
+	rl.DrawTextureRec(player.animation_player.texture^, source_rect, relative_position, rl.WHITE)
 }
 
 player_shoot :: proc() {
@@ -117,6 +147,17 @@ player_dodge :: proc() {
 			duration = 0.2,
 		}
 		player.dodge_cooldown = 1
+	}
+
+	anim := &player.animation_player
+	anim.animation_progression += TICK_RATE
+	if anim.animation_progression > anim.frame_length {
+		anim.animation_progression = 0
+		new_frame := anim.current_frame + 1
+		if new_frame > anim.current_animation.end {
+			new_frame = anim.current_animation.start
+		}
+		anim.current_frame = new_frame
 	}
 }
 

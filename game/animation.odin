@@ -31,3 +31,7 @@ enemy_animations := [EnemyTag][EnemyState]Animation {
 		.Spawning = {start = 44, end = 50}, // TODO
 	},
 }
+
+character_animations := [Character_Tag][PlayerAnimationState]Animation {
+	.MiniNobleWoman = {.Idle = {start = 0, end = 3}, .Moving = {start = 6, end = 11}},
+}

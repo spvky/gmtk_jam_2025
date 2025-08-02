@@ -52,6 +52,7 @@ init :: proc() {
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	world = make_world()
 	enemy_texture_atlas = make_enemy_texture_atlas()
+	character_texture_atlas = make_character_texture_atlas()
 	input_streams = make_input_streams()
 	enemies = make([dynamic]Enemy, 0, 32)
 	bullets = make([dynamic]Bullet, 0, 128)

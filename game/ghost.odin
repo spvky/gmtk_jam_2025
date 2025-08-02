@@ -116,9 +116,25 @@ draw_ghosts :: proc() {
 				rl.WHITE,
 			)
 		}
+		// TODO actually animate ghost, instead of stealing from player
 
-		// TODO draw any real animated texture here, instead of rectangle
-		rl.DrawRectangleV(get_relative_position(ghost.translation), {16, 16}, rl.WHITE)
+		player := world.player
+		current_frame := player.animation_player.current_frame
+		x_position := f32(current_frame % 6) * 32
+		y_position := f32(current_frame / 6) * 32
+		source_rect := rl.Rectangle {
+			x      = x_position,
+			y      = y_position,
+			width  = 32,
+			height = 32,
+		}
+
+		rl.DrawTextureRec(
+			player.animation_player.texture^,
+			source_rect,
+			get_relative_position(ghost.translation),
+			rl.WHITE,
+		)
 		rl.EndShaderMode()
 	}
 }
