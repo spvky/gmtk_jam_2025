@@ -72,8 +72,6 @@ make_upgrades :: proc() {
 
 	prev_entity: Entity
 	to_spawn := pick_upgrades()
-	fmt.println(len(to_spawn))
-	upgrades_spawned: int
 
 	for entity in world.levels[world.current_level].entities {
 		for &upgrade in to_spawn {
@@ -90,8 +88,6 @@ make_upgrades :: proc() {
 				upgrade.has_spawned = true
 
 			}
-			fmt.println(upgrade.has_spawned)
-			fmt.println(len(to_spawn))
 		}
 
 	}
