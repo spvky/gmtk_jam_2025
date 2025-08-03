@@ -20,6 +20,7 @@ Player :: struct {
 }
 
 PlayerAttributes :: struct {
+	damage:          u8,
 	radius:          f32,
 	dodge_cooldown:  f32,
 	shot_amount:     int,
@@ -56,6 +57,7 @@ chosen_character: Character_Tag
 make_player :: proc() -> Player {
 	chosen_character = .MiniNobleWoman
 	attributes := PlayerAttributes {
+		damage          = 5,
 		radius          = 8,
 		shot_type       = .Normal,
 		shot_amount     = 1,

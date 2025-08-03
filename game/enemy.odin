@@ -53,9 +53,9 @@ make_enemy :: proc(tag: EnemyTag, position: Vec2) -> Enemy {
 
 	switch tag {
 	case .Skeleton:
-		health_val = 5
+		health_val = 12
 	case .Vampire:
-		health_val = 3
+		health_val = 8
 	}
 
 	return Enemy {
