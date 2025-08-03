@@ -79,6 +79,7 @@ make_upgrades :: proc() {
 	prev_entity: Entity
 	to_spawn := pick_upgrades()
 
+	upgrades_spawned := 0
 	for entity in world.levels[world.current_level].entities {
 		for &upgrade in to_spawn {
 			if entity.type == .Upgrade_Spawn &&
