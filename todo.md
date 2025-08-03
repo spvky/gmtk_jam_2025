@@ -8,5 +8,4 @@
 - complete Hub
 - complete level
 - sfx
-- enemies handling 'Die' state
 - add remaining waves
