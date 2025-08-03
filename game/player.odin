@@ -13,7 +13,6 @@ Player :: struct {
 	state:                  PlayerState,
 	translation:            Vec2,
 	velocity:               Vec2,
-	using attributes:       PlayerAttributes,
 	animation_player:       AnimationPlayer,
 	player_animation_state: PlayerAnimationState,
 	health:                 u8,
@@ -66,13 +65,7 @@ make_player :: proc() -> Player {
 	}
 	append(&player_attributes, attributes)
 	return Player {
-		radius = 8,
-		shot_type = .Normal,
 		state = PlayerMoving{},
-		shot_amount = 1,
-		shot_iterations = 1,
-		shot_speed = 100,
-		shot_spread = 22.5,
 		animation_player = AnimationPlayer {
 			frame_length = 0.1,
 			texture = &character_texture_atlas[chosen_character],
@@ -106,27 +99,28 @@ player_shoot :: proc() {
 	player := &world.player
 	input := world.current_input_tick
 	translation := player.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
+	attributes := player_attributes[0]
 	if .Shoot in input.buttons {
 		spawner: BulletSpawner
-		switch player.shot_type {
+		switch attributes.shot_type {
 		case .Normal:
 			spawner = make_arc_spawner(
 				tag = .Player,
 				source = translation,
-				shot_count = player.shot_amount,
-				wave_count = player.shot_iterations,
+				shot_count = attributes.shot_amount,
+				wave_count = attributes.shot_iterations,
 				distance = 8,
 				shot_cooldown = 0.05,
 				angle = input.mouse_rotation,
-				arc = player.shot_spread,
-				speed = player.shot_speed,
+				arc = attributes.shot_spread,
+				speed = attributes.shot_speed,
 			)
 		case .Spiral:
 			spawner = make_circle_spawner(
 				tag = .Player,
 				source = translation,
-				shot_count = player.shot_amount,
-				wave_count = player.shot_iterations,
+				shot_count = attributes.shot_amount,
+				wave_count = attributes.shot_iterations,
 				distance = 8,
 				shot_cooldown = 0.05,
 				rotation_speed = 360,
@@ -136,8 +130,8 @@ player_shoot :: proc() {
 			spawner = make_orbital_spawner(
 				tag = .Player,
 				source = translation,
-				shot_count = player.shot_amount,
-				wave_count = player.shot_iterations,
+				shot_count = attributes.shot_amount,
+				wave_count = attributes.shot_iterations,
 				distance = 8,
 				shot_cooldown = 0.05,
 				angle = input.mouse_rotation,
@@ -185,6 +179,8 @@ kill_player :: proc() {
 }
 
 player_wins_wave :: proc() {
+	attributes := player_attributes[0]
+	inject_at(&player_attributes, 0, attributes)
 	clear_dynamic_collections()
 	world.current_level = .Hub
 	world.player.translation = current_spawn_point()

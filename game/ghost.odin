@@ -86,7 +86,7 @@ update_ghosts :: proc() {
 
 	for i in 0 ..< len(ghosts) {
 		ghost := &ghosts[i]
-		apply_ghost_inputs(ghost, input_streams[i + 1][world.current_tick - delay], player_attributes[i])
+		apply_ghost_inputs(ghost, input_streams[i + 1][world.current_tick - delay], player_attributes[i + 1])
 
 
 		i := len(ghost.particles) - 1

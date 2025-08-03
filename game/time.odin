@@ -18,13 +18,13 @@ hard_reset_loop :: proc() {
 	world.loop_number = 0
 	world.simulation_time = 0
 	world.game_state = .Looping
+	world.first_loop_started = false
 	clear(&input_streams)
 	start_new_loop()
 }
 
 start_new_loop :: proc() {
 	inject_at_elem(&input_streams, 0, InputStream{})
-	inject_at_elem(&player_attributes, 0, world.player.attributes)
 	when ODIN_DEBUG {
 		fmt.printfln(
 			"Starting new loop: %v\nPlayers: %v\nInput Streams: %v",

@@ -95,10 +95,11 @@ draw_upgrades :: proc() {
 }
 
 apply_upgrade :: proc(type: Upgrade_Type) {
+	attributes := &player_attributes[0]
 	switch type {
 	case .Spread:
-		world.player.shot_amount = 4
-		world.player.shot_spread = 30.
+		attributes.shot_amount = 4
+		attributes.shot_spread = 30.
 	}
 }
 

@@ -9,6 +9,7 @@ World :: struct {
 	player:             Player,
 	levels:             [dynamic]Level,
 	current_level:      Level_Enum,
+	first_loop_started: bool,
 }
 
 GameState :: enum {

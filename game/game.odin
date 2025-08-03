@@ -57,7 +57,6 @@ init :: proc() {
 	WINDOW_HEIGHT = 900
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
-	world = make_world()
 	enemy_texture_atlas = make_enemy_texture_atlas()
 	character_texture_atlas = make_character_texture_atlas()
 	input_streams = make_input_streams()
@@ -88,7 +87,6 @@ init :: proc() {
 
 spawn_player_and_ghosts :: proc() {
 	spawn_point := get_spawn_point(world.levels[world.current_level])
-	// append(&player_attributes, player.attributes)
 	world.player.translation = spawn_point
 	inputs_length := len(input_streams)
 	if inputs_length > 1 {
@@ -144,10 +142,6 @@ playing :: proc() {
 	level: Level = world.levels[world.current_level]
 
 	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
-
-	if rl.IsKeyPressed(.R) {
-		reset_loop()
-	}
 
 	input := world.current_input_tick
 
