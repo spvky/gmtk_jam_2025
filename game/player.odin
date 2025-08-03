@@ -1,6 +1,7 @@
 package game
 
 import "core:fmt"
+import "core:math"
 import l "core:math/linalg"
 import rl "vendor:raylib"
 
@@ -35,6 +36,7 @@ PlayerState :: union {
 PlayerAnimationState :: enum {
 	Idle,
 	Moving,
+	Dead,
 }
 
 PlayerMoving :: struct {}
@@ -50,8 +52,9 @@ Character_Tag :: enum {
 
 character_sheet: rl.Texture
 
+chosen_character: Character_Tag
 make_player :: proc() -> Player {
-	chosen_character: Character_Tag = .MiniNobleWoman
+	chosen_character = .MiniNobleWoman
 	attributes := PlayerAttributes {
 		radius          = 8,
 		shot_type       = .Normal,
@@ -203,6 +206,10 @@ kill_player :: proc() {
 	world.current_level = .Hub
 	world.player.translation = current_spawn_point()
 	world.player.health = PLAYER_HEALTH
+
+	world.player.player_animation_state = .Idle
+	world.player.animation_player.current_animation = character_animations[chosen_character][.Idle]
+
 	hard_reset_loop()
 }
 
@@ -216,7 +223,19 @@ player_wins_wave :: proc() {
 }
 
 check_player_health :: proc() {
-	if world.player.health == 0 {
+	if world.player.player_animation_state == .Dead &&
+	   world.player.animation_player.current_frame == world.player.animation_player.current_animation.end {
 		kill_player()
+		return
+
+	} else if world.player.health == 0 {
+		if world.player.player_animation_state != .Dead {
+
+			world.player.player_animation_state = .Dead
+			world.player.animation_player.current_animation = character_animations[chosen_character][.Dead]
+			world.player.animation_player.current_frame = world.player.animation_player.current_animation.start
+		} else {
+			vignette_radius_uv_space -= 0.01
+		}
 	}
 }

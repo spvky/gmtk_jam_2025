@@ -33,5 +33,5 @@ enemy_animations := [EnemyTag][EnemyState]Animation {
 }
 
 character_animations := [Character_Tag][PlayerAnimationState]Animation {
-	.MiniNobleWoman = {.Idle = {start = 0, end = 3}, .Moving = {start = 6, end = 11}},
+	.MiniNobleWoman = {.Idle = {start = 0, end = 3}, .Moving = {start = 6, end = 11}, .Dead = {start = 24, end = 30}},
 }
