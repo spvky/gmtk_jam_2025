@@ -46,6 +46,10 @@ cost_map: [][]int
 flow_field: [][]rl.Vector2
 
 ghost_shader: rl.Shader
+vignette_shader: rl.Shader
+
+MAX_VIGNETTE_RADIUS: f32 = 0.55
+vignette_radius_uv_space: f32 = MAX_VIGNETTE_RADIUS
 
 init :: proc() {
 	WINDOW_WIDTH = 1600
@@ -74,6 +78,7 @@ init :: proc() {
 	rl.SetTargetFPS(60)
 
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
+	vignette_shader = rl.LoadShader(nil, "assets/shaders/vignette.glsl")
 
 	init_waves()
 	init_upgrades()
@@ -119,6 +124,7 @@ draw :: proc() {
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.BLACK)
+	rl.BeginShaderMode(vignette_shader)
 	rl.DrawTexturePro(
 		screen_texture.texture,
 		{0, 0, SCREEN_WIDTH, -SCREEN_HEIGHT},
@@ -127,6 +133,7 @@ draw :: proc() {
 		0,
 		rl.WHITE,
 	)
+	rl.EndShaderMode()
 	rl.EndDrawing()
 }
 
@@ -149,7 +156,13 @@ playing :: proc() {
 	u_time := f32(rl.GetTime())
 
 	rl.SetShaderValue(ghost_shader, rl.GetShaderLocation(ghost_shader, "u_time"), &u_time, .FLOAT)
-
+	rl.SetShaderValue(vignette_shader, rl.GetShaderLocation(vignette_shader, "u_time"), &u_time, .FLOAT)
+	rl.SetShaderValue(
+		vignette_shader,
+		rl.GetShaderLocation(vignette_shader, "u_radius"),
+		&vignette_radius_uv_space,
+		.FLOAT,
+	)
 
 	if world.current_level == .Level {
 
@@ -169,8 +182,8 @@ playing :: proc() {
 
 
 		if world.current_level == .Hub {
-
 			update_upgrades()
+			vignette_radius_uv_space = math.min(vignette_radius_uv_space + 0.01, MAX_VIGNETTE_RADIUS)
 			world.current_tick = 0
 		}
 
