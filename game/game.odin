@@ -81,7 +81,9 @@ init :: proc() {
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
 	vignette_shader = rl.LoadShader(nil, "assets/shaders/vignette.glsl")
 
-	rl.HideCursor()
+	when ODIN_OS != .JS {
+		rl.HideCursor()
+	}
 
 	init_waves()
 	init_upgrades()
