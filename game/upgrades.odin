@@ -19,6 +19,7 @@ Upgrade :: struct {
 	draw_coords: rl.Rectangle,
 	pos:         Vec2,
 	state:       Upgrade_State,
+	has_spawned: bool,
 }
 
 Upgrade_State :: enum {
@@ -36,9 +37,9 @@ init_upgrades :: proc() {
 
 	upgrade_sheet = rl.LoadTexture("assets/sprites/spreadshot.png")
 
-	append(&upgrade_choices, Upgrade{.Spread, 3, {0, 0, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
-	append(&upgrade_choices, Upgrade{.Orbital, 5, {0, 32, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
-	append(&upgrade_choices, Upgrade{.Spiral, 5, {0, 64, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
+	append(&upgrade_choices, Upgrade{.Spread, 3, {0, 0, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle, false})
+	append(&upgrade_choices, Upgrade{.Orbital, 5, {0, 32, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle, false})
+	append(&upgrade_choices, Upgrade{.Spiral, 5, {0, 64, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle, false})
 
 }
 
@@ -49,11 +50,18 @@ clear_upgrades :: proc() {
 pick_upgrades :: proc() -> [dynamic]Upgrade {
 
 	to_spawn: [dynamic]Upgrade
+	choices := make([dynamic]Upgrade, 0)
 
-	count := math.clamp((world.loop_number + 1) / 2, 1, 4)
+	for upgrade in upgrade_choices {
+		append(&choices, upgrade)
+	}
+
+	rand.shuffle(choices[:])
+
+	count := math.clamp((world.loop_number + 1) / 2, 1, 3)
 
 	for i in 0 ..< count {
-		append(&to_spawn, rand.choice(upgrade_choices[:]))
+		append(&to_spawn, choices[i])
 	}
 
 	return to_spawn
@@ -71,17 +79,19 @@ make_upgrades :: proc() {
 		for &upgrade in to_spawn {
 			if entity.type == .Upgrade_Spawn &&
 			   upgrades_spawned < len(to_spawn) &&
-			   entity.position != prev_entity.position {
+			   entity.position != prev_entity.position &&
+			   !upgrade.has_spawned {
 
 
 				upgrade.pos = entity.position
 				append(&upgrades, upgrade)
 				upgrades_spawned += 1
 				prev_entity = entity
-				fmt.println("made upgrade")
-
+				upgrade.has_spawned = true
 
 			}
+			fmt.println(upgrade.has_spawned)
+			fmt.println(len(to_spawn))
 		}
 
 	}
@@ -129,6 +139,7 @@ reset_upgrades :: proc() {
 update_upgrades :: proc() {
 
 	attributes := &player_attributes[0]
+	upgrade_picked := false
 
 	input := world.current_input_tick
 	for &upgrade in upgrades {
@@ -153,7 +164,10 @@ update_upgrades :: proc() {
 			upgrade.draw_coords = hover_texture
 			if .Interact in input.buttons {
 				apply_upgrade(upgrade.type)
+				upgrade_picked = true
+				break
 			}
 		}
 	}
+	if upgrade_picked {clear(&upgrades)}
 }
