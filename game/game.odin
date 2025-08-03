@@ -152,7 +152,26 @@ playing :: proc() {
 	input := world.current_input_tick
 
 	target_position := world.player.translation - rl.Vector2{f32(SCREEN_WIDTH), f32(SCREEN_HEIGHT)} / 2
+
+
 	update_camera_position(target_position)
+	// clamping to level in x axis
+	camera.offset_position.x = math.max(
+		level.position.x + (camera_strength_factor / 2),
+		math.min(
+			level.position.x + f32(level.width) - SCREEN_WIDTH - (camera_strength_factor / 2),
+			camera.offset_position.x,
+		),
+	)
+
+	// clamping to level in y axis
+	camera.offset_position.y = math.max(
+		level.position.y + (camera_strength_factor / 2),
+		math.min(
+			level.position.y + f32(level.height) - SCREEN_HEIGHT - (camera_strength_factor / 2),
+			camera.offset_position.y,
+		),
+	)
 
 
 	u_time := f32(rl.GetTime())
