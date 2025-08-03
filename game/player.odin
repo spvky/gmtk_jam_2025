@@ -175,6 +175,7 @@ kill_player :: proc() {
 	world.player.player_animation_state = .Idle
 	world.player.animation_player.current_animation = character_animations[chosen_character][.Idle]
 
+	reset_upgrades()
 	hard_reset_loop()
 }
 
@@ -185,6 +186,7 @@ player_wins_wave :: proc() {
 	world.current_level = .Hub
 	world.player.translation = current_spawn_point()
 	world.player.health = PLAYER_HEALTH
+	reset_upgrades()
 	reset_loop()
 	make_upgrades()
 }

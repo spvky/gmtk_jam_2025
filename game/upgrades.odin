@@ -9,6 +9,9 @@ upgrade_sheet: rl.Texture
 upgrade_choices: [dynamic]Upgrade
 upgrades: [dynamic]Upgrade
 UPGRADE_SIZE :: 32
+SPRITES_PER_ROW :: 2
+SHEET_WIDTH :: 64
+SHEET_HEIGHT :: 96
 
 Upgrade :: struct {
 	type:        Upgrade_Type,
@@ -25,6 +28,8 @@ Upgrade_State :: enum {
 
 Upgrade_Type :: enum {
 	Spread,
+	Orbital,
+	Spiral,
 }
 
 init_upgrades :: proc() {
@@ -32,6 +37,8 @@ init_upgrades :: proc() {
 	upgrade_sheet = rl.LoadTexture("assets/sprites/spreadshot.png")
 
 	append(&upgrade_choices, Upgrade{.Spread, 3, {0, 0, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
+	append(&upgrade_choices, Upgrade{.Orbital, 5, {0, 32, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
+	append(&upgrade_choices, Upgrade{.Spiral, 5, {0, 64, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
 
 }
 
@@ -100,10 +107,28 @@ apply_upgrade :: proc(type: Upgrade_Type) {
 	case .Spread:
 		attributes.shot_amount = 4
 		attributes.shot_spread = 30.
+
+
+	case .Orbital:
+		attributes.shot_amount = 4
+		attributes.shot_type = .Orbital
+
+	case .Spiral:
+		attributes.shot_amount = 10
+		attributes.shot_type = .Spiral
 	}
 }
 
+reset_upgrades :: proc() {
+	attributes := &player_attributes[0]
+	attributes.shot_amount = 1
+	attributes.shot_spread = 22.5
+	attributes.shot_type = .Normal
+}
+
 update_upgrades :: proc() {
+
+	attributes := &player_attributes[0]
 
 	input := world.current_input_tick
 	for &upgrade in upgrades {
