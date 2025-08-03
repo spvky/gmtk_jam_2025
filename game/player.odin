@@ -101,6 +101,7 @@ player_shoot :: proc() {
 	attributes := player_attributes[0]
 	translation := player.translation + Vec2{f32(TILE_SIZE), f32(TILE_SIZE + 4)}
 	if .Shoot in input.buttons {
+		play_sound(.PlayerShoot)
 		spawner: BulletSpawner
 		switch attributes.shot_type {
 		case .Normal:

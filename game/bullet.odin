@@ -279,6 +279,7 @@ check_bullet_collision :: proc() {
 					damage_value := player_attributes[0].damage
 					if damage_value <= enemy.health {
 						enemy.health -= damage_value
+						play_sound(.EnemyHit)
 					} else {
 						enemy.health = 0
 					}
@@ -297,6 +298,7 @@ check_bullet_collision :: proc() {
 				has_collided = true
 				if world.player.health > 0 {
 					world.player.health -= 1
+					play_sound(.PlayerHit)
 				}
 				append(&to_remove, i)
 			}

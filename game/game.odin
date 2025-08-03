@@ -11,6 +11,7 @@ import rl "vendor:raylib"
 Vec2 :: rl.Vector2
 
 world: World
+sounds: [Sound]rl.Sound
 screen_texture: rl.RenderTexture
 input_streams: [dynamic]InputStream
 player_attributes: [dynamic]PlayerAttributes
@@ -56,6 +57,7 @@ init :: proc() {
 	WINDOW_WIDTH = 1600
 	WINDOW_HEIGHT = 900
 	rl.InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Game")
+	rl.InitAudioDevice()
 	screen_texture = rl.LoadRenderTexture(SCREEN_WIDTH, SCREEN_HEIGHT)
 	enemy_texture_atlas = make_enemy_texture_atlas()
 	character_texture_atlas = make_character_texture_atlas()
@@ -65,6 +67,7 @@ init :: proc() {
 	bullets = make([dynamic]Bullet, 0, 128)
 	bullet_spawners = make([dynamic]BulletSpawner, 0, 16)
 	world = make_world()
+	sounds = load_sounds()
 	enemy_texture_atlas = make_enemy_texture_atlas()
 	input_streams = make_input_streams()
 
@@ -272,6 +275,7 @@ clear_dynamic_collections :: proc() {
 shutdown :: proc() {
 	rl.UnloadRenderTexture(screen_texture)
 	rl.CloseWindow()
+	rl.CloseAudioDevice()
 	destroy_input_streams()
 }
 

@@ -205,6 +205,7 @@ enemy_attack :: proc(enemy: ^Enemy) {
 		if l.distance(enemy.position, target_position) < 20 {
 			if world.player.health > 0 {
 				world.player.health -= 1
+				play_sound(.PlayerHit)
 			}
 		}
 	case .Vampire:
@@ -229,15 +230,6 @@ draw_enemies :: proc() {
 			width  = 32 * facing,
 			height = 32,
 		}
-		// debug
-		// rl.DrawLineV(relative_position, relative_position + enemy.direction * 16, rl.GREEN)
-		// we are correctly computing the position for the enemies, but because the sprite sizes are not what we anticipate the dimenions here are iffy and we end up drawing from 1 tile^2 to the topleft.
-		// but you can uncomment the debug drawing to validate
-
-		// drawing debug rectangle for the the where we compute their position from
-		// rl.DrawRectangleV(relative_position, {16, 16}, rl.WHITE)
-
-		// drawing sprite at an odd offset to align the sprite with where they are in the world
 		red := [4]f32{230, 41, 55, 255}
 		white := [4]f32{255, 255, 255, 255}
 		color := math.lerp(white, red, enemy.damaged_timer / ENEMY_DAMAGE_TIME)
