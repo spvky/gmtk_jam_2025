@@ -22,7 +22,6 @@ Player :: struct {
 PlayerAttributes :: struct {
 	damage:          u8,
 	radius:          f32,
-	dodge_cooldown:  f32,
 	shot_amount:     int,
 	shot_iterations: int,
 	shot_spread:     f32,
@@ -149,36 +148,6 @@ player_shoot :: proc() {
 		}
 
 		append(&bullet_spawners, spawner)
-	}
-}
-
-player_dodge :: proc() {
-	player := &world.player
-	input := world.current_input_tick
-	should_dodge := .Roll in input.buttons
-	direction := input.direction
-
-	if player.dodge_cooldown > 0 {
-		player.dodge_cooldown = clamp(player.dodge_cooldown - TICK_RATE, 0, player.dodge_cooldown)
-	}
-
-	if player.dodge_cooldown == 0 && should_dodge && input.direction != {0, 0} {
-		player.state = PlayerDodging {
-			target   = player.translation + (direction * PLAYER_ROLL_DISTANCE),
-			duration = 0.2,
-		}
-		player.dodge_cooldown = 1
-	}
-
-	anim := &player.animation_player
-	anim.animation_progression += TICK_RATE
-	if anim.animation_progression > anim.frame_length {
-		anim.animation_progression = 0
-		new_frame := anim.current_frame + 1
-		if new_frame > anim.current_animation.end {
-			new_frame = anim.current_animation.start
-		}
-		anim.current_frame = new_frame
 	}
 }
 
