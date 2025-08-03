@@ -116,7 +116,7 @@ read_input :: proc(mouse_rotation: f32) {
 
 	buttons: bit_set[Button]
 
-	if rl.IsKeyDown(.SPACE) || rl.IsMouseButtonPressed(.LEFT) {
+	if rl.IsMouseButtonPressed(.LEFT) {
 		buttons = buttons | {.Shoot}
 	}
 	if rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT) {
