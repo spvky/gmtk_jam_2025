@@ -141,7 +141,9 @@ draw :: proc() {
 playing :: proc() {
 	level: Level = world.levels[world.current_level]
 
-	relative_mouse_rotation := get_mouse_rotation(get_relative_position(world.player.translation))
+	relative_mouse_rotation := get_mouse_rotation(
+		get_relative_position(world.player.translation - {f32(TILE_SIZE), f32(TILE_SIZE)}),
+	)
 
 	input := world.current_input_tick
 
@@ -190,7 +192,7 @@ playing :: proc() {
 			// or / also at only certain intervals if we want
 			cells := level.cell_grid
 
-			grid_position := (world.player.translation - level.position) / TILE_SIZE
+			grid_position := (world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE)} - level.position) / TILE_SIZE
 
 			cost_map = pathfinding.generate_cost_map(cells, [2]int{int(grid_position.x), int(grid_position.y)})
 			flow_field = pathfinding.generate_flow_field(cost_map, cells)

@@ -18,7 +18,7 @@ Enemy :: struct {
 }
 
 ENEMY_DAMAGE_TIME :: 0.3
-SKELETON_ATTACK_RANGE_RADIUS_PX :: 8
+SKELETON_ATTACK_RANGE_RADIUS_PX :: 16
 VAMPIRE_ATTACK_RANGE_RADIUS_PX :: 120
 
 MARCHING_STEPS :: 20
@@ -109,12 +109,14 @@ raymarch :: proc(start: Vec2, end: Vec2) -> bool {
 }
 
 should_enemy_be_attacking :: proc(enemy: Enemy) -> bool {
+	target_position := world.player.translation
+	target_position += {f32(TILE_SIZE), f32(TILE_SIZE)}
 	switch enemy.tag {
 	case .Skeleton:
-		return l.distance(enemy.position, world.player.translation) < SKELETON_ATTACK_RANGE_RADIUS_PX
+		return l.distance(enemy.position, target_position) < SKELETON_ATTACK_RANGE_RADIUS_PX
 	case .Vampire:
-		if l.distance(enemy.position, world.player.translation) < VAMPIRE_ATTACK_RANGE_RADIUS_PX {
-			return !raymarch(enemy.position, world.player.translation)
+		if l.distance(enemy.position, target_position) < VAMPIRE_ATTACK_RANGE_RADIUS_PX {
+			return !raymarch(enemy.position, target_position)
 		}
 	}
 	return false

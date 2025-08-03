@@ -268,7 +268,12 @@ check_bullet_collision :: proc() {
 		switch bullet.tag {
 		case .Player:
 			for &enemy in enemies {
-				if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, enemy.position, 8) &&
+				if rl.CheckCollisionCircles(
+					   bullet.position,
+					   BULLET_RADIUS,
+					   enemy.position + {f32(TILE_SIZE / 2), f32(TILE_SIZE / 2)},
+					   8,
+				   ) &&
 				   !has_collided &&
 				   enemy.health > 0 {
 					has_collided = true
@@ -284,7 +289,13 @@ check_bullet_collision :: proc() {
 			}
 
 		case .Enemy:
-			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) && !has_collided {
+			if rl.CheckCollisionCircles(
+				   bullet.position,
+				   BULLET_RADIUS,
+				   world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE + 4)},
+				   8,
+			   ) &&
+			   !has_collided {
 				has_collided = true
 				if world.player.health > 0 {
 					world.player.health -= 1
