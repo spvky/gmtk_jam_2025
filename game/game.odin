@@ -120,7 +120,6 @@ draw :: proc() {
 	draw_bullets()
 	draw_ghosts()
 	draw_upgrades()
-	display_clock()
 	draw_ui()
 	rl.EndTextureMode()
 

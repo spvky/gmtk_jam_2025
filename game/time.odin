@@ -4,12 +4,6 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
-display_clock :: proc() {
-	time_to_display := 100.0 - f32(world.current_tick) * TICK_RATE
-	time_string := fmt.tprintf("%3.2f", time_to_display)
-	rl.DrawText(strings.clone_to_cstring(time_string), 375, 10, 24, rl.WHITE)
-}
-
 reset_loop :: proc() {
 	world.current_tick = 0
 	world.loop_number += 1
