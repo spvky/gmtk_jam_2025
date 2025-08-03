@@ -1,11 +1,7 @@
 # TODO for submition
 
-- fix coordinates, for collisions and pathfinding etc.
-- fix draw order
-- UI
 - upgrades
-- complete roll
-- complete Hub
-- complete level
+- skeleton damage
+- camera clamping
 - sfx
 - add remaining waves
