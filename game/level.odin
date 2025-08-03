@@ -250,6 +250,7 @@ handle_triggers :: proc(world: ^World) {
 			world.current_level = .Level
 			level = world.levels[world.current_level]
 			spawn_player_and_ghosts()
+			clear_upgrades()
 		}
 	}
 }

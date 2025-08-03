@@ -212,6 +212,7 @@ player_wins_wave :: proc() {
 	world.player.translation = current_spawn_point()
 	world.player.health = PLAYER_HEALTH
 	reset_loop()
+	make_upgrades()
 }
 
 check_player_health :: proc() {

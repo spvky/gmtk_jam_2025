@@ -112,8 +112,8 @@ draw :: proc() {
 	draw_enemies()
 	draw_bullets()
 	draw_ghosts()
+	draw_upgrades()
 	display_clock()
-	make_upgrades()
 	rl.EndTextureMode()
 
 
