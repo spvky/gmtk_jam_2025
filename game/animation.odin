@@ -28,7 +28,7 @@ enemy_animations := [EnemyTag][EnemyState]Animation {
 		.Movement = {start = 6, end = 13},
 		.Die = {start = 14, end = 27},
 		.Attack = {start = 28, end = 43},
-		.Spawning = {start = 44, end = 50}, // TODO
+		.Spawning = {start = 44, end = 54},
 	},
 }
 
