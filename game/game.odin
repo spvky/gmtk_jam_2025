@@ -105,6 +105,9 @@ spawn_player_and_ghosts :: proc() {
 
 
 update :: proc() {
+	if rl.IsKeyPressed(.F1) {
+		rl.ToggleFullscreen()
+	}
 	switch world.game_state {
 	case .Playing:
 		playing()
