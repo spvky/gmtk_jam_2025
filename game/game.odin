@@ -86,6 +86,7 @@ init :: proc() {
 
 spawn_player_and_ghosts :: proc() {
 	spawn_point := get_spawn_point(world.levels[world.current_level])
+	// append(&player_attributes, player.attributes)
 	world.player.translation = spawn_point
 	inputs_length := len(input_streams)
 	if inputs_length > 1 {

@@ -193,6 +193,20 @@ player_wins_wave :: proc() {
 	make_upgrades()
 }
 
+player_animations :: proc() {
+	player := &world.player
+	anim := &player.animation_player
+	anim.animation_progression += TICK_RATE
+	if anim.animation_progression > anim.frame_length {
+		anim.animation_progression = 0
+		new_frame := anim.current_frame + 1
+		if new_frame > anim.current_animation.end {
+			new_frame = anim.current_animation.start
+		}
+		anim.current_frame = new_frame
+	}
+}
+
 check_player_health :: proc() {
 	if world.player.player_animation_state == .Dead &&
 	   world.player.animation_player.current_frame == world.player.animation_player.current_animation.end {

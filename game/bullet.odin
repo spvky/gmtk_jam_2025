@@ -273,6 +273,7 @@ check_bullet_collision :: proc() {
 				   enemy.health > 0 {
 					has_collided = true
 					damage_value := player_attributes[0].damage
+					fmt.printfln("Damage: %v", damage_value)
 					if damage_value <= enemy.health {
 						enemy.health -= damage_value
 					} else {
