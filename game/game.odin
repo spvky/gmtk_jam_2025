@@ -40,6 +40,7 @@ bullet_control := BulletControl {
 // temporary debug access
 
 tilesheet: rl.Texture
+ui_tilesheet: rl.Texture
 
 // TODO move somewhere sensible
 cost_map: [][]int
@@ -69,6 +70,7 @@ init :: proc() {
 	input_streams = make_input_streams()
 
 	tilesheet = rl.LoadTexture("assets/asset_pack/character and tileset/Dungeon_Tileset.png")
+	ui_tilesheet = rl.LoadTexture("assets/sprites/ui.png")
 	if project, ok := ldtk.load_from_file("assets/level.ldtk", context.temp_allocator).?; ok {
 		world.levels = get_all_levels(project)
 		world.current_level = .Hub
@@ -119,6 +121,7 @@ draw :: proc() {
 	draw_ghosts()
 	draw_upgrades()
 	display_clock()
+	draw_ui()
 	rl.EndTextureMode()
 
 
@@ -242,4 +245,31 @@ parent_window_size_changed :: proc(w, h: int) {
 	WINDOW_WIDTH = i32(w)
 	WINDOW_HEIGHT = i32(h)
 	rl.SetWindowSize(c.int(WINDOW_WIDTH), c.int(WINDOW_WIDTH))
+}
+
+draw_ui :: proc() {
+	UI_POSITION_OFFSET_Y :: 180
+	UI_POSITION_OFFSET_X :: 0
+
+	width :: 16
+
+	// drawing health
+	for i in 0 ..< PLAYER_HEALTH {
+		rl.DrawTextureRec(
+			ui_tilesheet,
+			{0, 0, width, width} if int(world.player.health) >= i else {width, 0, width, width},
+			{f32(UI_POSITION_OFFSET_X + i * width), UI_POSITION_OFFSET_Y},
+			rl.WHITE,
+		)
+	}
+
+	// drawing floor and level info
+	time_to_display := 100.0 - f32(world.current_tick) * TICK_RATE
+	rl.DrawText(
+		rl.TextFormat("T - %.2f\nL - %d", time_to_display, world.loop_number),
+		UI_POSITION_OFFSET_X,
+		UI_POSITION_OFFSET_Y + width,
+		10,
+		rl.WHITE,
+	)
 }
