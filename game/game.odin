@@ -241,8 +241,8 @@ parent_window_size_changed :: proc(w, h: int) {
 }
 
 draw_ui :: proc() {
-	UI_POSITION_OFFSET_Y :: 180
-	UI_POSITION_OFFSET_X :: 0
+	UI_POSITION_OFFSET_Y :: 10
+	UI_POSITION_OFFSET_X :: 240
 
 	width :: 16
 
