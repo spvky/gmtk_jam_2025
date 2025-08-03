@@ -274,7 +274,6 @@ check_bullet_collision :: proc() {
 					   enemy.position + {f32(TILE_SIZE / 2), f32(TILE_SIZE / 2)},
 					   8,
 				   ) &&
-				   !has_collided &&
 				   enemy.health > 0 {
 					has_collided = true
 					damage_value := player_attributes[0].damage
@@ -290,12 +289,11 @@ check_bullet_collision :: proc() {
 
 		case .Enemy:
 			if rl.CheckCollisionCircles(
-				   bullet.position,
-				   BULLET_RADIUS,
-				   world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE + 4)},
-				   8,
-			   ) &&
-			   !has_collided {
+				bullet.position,
+				BULLET_RADIUS,
+				world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE + 4)},
+				8,
+			) {
 				has_collided = true
 				if world.player.health > 0 {
 					world.player.health -= 1
@@ -304,23 +302,24 @@ check_bullet_collision :: proc() {
 			}
 
 		case .Ghost:
-			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) && !has_collided {
+			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) {
 				has_collided = true
 				kill_player()
 				append(&to_remove, i)
 			}
 		}
 
-		level := world.levels[world.current_level]
-		for tile in level.tiles {
-			if .Collision in tile.properties {
-				tile_position := tile.position + level.position
-				tile_rec := rl.Rectangle{tile_position.x, tile_position.y, TILE_SIZE, TILE_SIZE}
-				if rl.CheckCollisionCircleRec(bullet.position, BULLET_RADIUS, tile_rec) {
-					has_collided = true
-					append(&to_remove, i)
-				}
+		if !has_collided {
+			level := world.levels[world.current_level]
+			for tile in level.tiles {
+				if .Collision in tile.properties {
+					tile_position := tile.position + level.position
+					tile_rec := rl.Rectangle{tile_position.x, tile_position.y, TILE_SIZE, TILE_SIZE}
+					if rl.CheckCollisionCircleRec(bullet.position, BULLET_RADIUS, tile_rec) {
+						append(&to_remove, i)
+					}
 
+				}
 			}
 		}
 
