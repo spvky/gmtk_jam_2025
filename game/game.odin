@@ -105,40 +105,58 @@ update :: proc() {
 	switch world.game_state {
 	case .Playing:
 		playing()
-	case .Paused:
-	case .MainMenu:
-	case .Looping:
+	case .EndScene:
 	}
 	free_all(context.temp_allocator)
 }
 
 draw :: proc() {
-	rl.BeginTextureMode(screen_texture)
-	rl.ClearBackground(rl.BLACK)
-	draw_tiles(world.levels[world.current_level], tilesheet, .Structure)
-	draw_tiles(world.levels[world.current_level], tilesheet, .Decor)
-	render_players()
-	draw_enemies()
-	draw_bullets()
-	draw_ghosts()
-	draw_upgrades()
-	draw_ui()
-	rl.EndTextureMode()
+	switch world.game_state {
+	case .Playing:
+		rl.BeginTextureMode(screen_texture)
+		rl.ClearBackground(rl.BLACK)
+		draw_tiles(world.levels[world.current_level], tilesheet, .Structure)
+		draw_tiles(world.levels[world.current_level], tilesheet, .Decor)
+		render_players()
+		draw_enemies()
+		draw_bullets()
+		draw_ghosts()
+		draw_upgrades()
+		draw_ui()
+		rl.EndTextureMode()
 
 
-	rl.BeginDrawing()
-	rl.ClearBackground(rl.BLACK)
-	rl.BeginShaderMode(vignette_shader)
-	rl.DrawTexturePro(
-		screen_texture.texture,
-		{0, 0, SCREEN_WIDTH, -SCREEN_HEIGHT},
-		{0, 0, f32(WINDOW_WIDTH), f32(WINDOW_HEIGHT)},
-		{0, 0},
-		0,
-		rl.WHITE,
-	)
-	rl.EndShaderMode()
-	rl.EndDrawing()
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.BLACK)
+		rl.BeginShaderMode(vignette_shader)
+		rl.DrawTexturePro(
+			screen_texture.texture,
+			{0, 0, SCREEN_WIDTH, -SCREEN_HEIGHT},
+			{0, 0, f32(WINDOW_WIDTH), f32(WINDOW_HEIGHT)},
+			{0, 0},
+			0,
+			rl.WHITE,
+		)
+		rl.EndShaderMode()
+		rl.EndDrawing()
+	case .EndScene:
+		rl.BeginTextureMode(screen_texture)
+		rl.ClearBackground(rl.BLACK)
+		rl.DrawText(rl.TextFormat("THANKS FOR PLAYING!"), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 10, rl.WHITE)
+		rl.EndTextureMode()
+
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.BLACK)
+		rl.DrawTexturePro(
+			screen_texture.texture,
+			{0, 0, SCREEN_WIDTH, -SCREEN_HEIGHT},
+			{0, 0, f32(WINDOW_WIDTH), f32(WINDOW_HEIGHT)},
+			{0, 0},
+			0,
+			rl.WHITE,
+		)
+		rl.EndDrawing()
+	}
 }
 
 // Gameplay Code
@@ -206,6 +224,11 @@ playing :: proc() {
 			update_upgrades()
 			vignette_radius_uv_space = math.min(vignette_radius_uv_space + 0.01, MAX_VIGNETTE_RADIUS)
 			world.current_tick = 0
+
+			if (world.loop_number == 7) {
+				world.game_state = .EndScene
+				return
+			}
 		}
 
 		if world.current_level == .Level {

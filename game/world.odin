@@ -14,9 +14,7 @@ World :: struct {
 
 GameState :: enum {
 	Playing,
-	MainMenu,
-	Paused,
-	Looping,
+	EndScene,
 }
 
 make_world :: proc() -> World {

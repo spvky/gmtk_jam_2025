@@ -8,7 +8,6 @@ reset_loop :: proc() {
 	world.current_tick = 0
 	world.loop_number += 1
 	world.simulation_time = 0
-	world.game_state = .Looping
 	// Seperating these to make it simpler to add a transition when resetting, for now it's immediate
 	start_new_loop()
 }
@@ -17,7 +16,6 @@ hard_reset_loop :: proc() {
 	world.current_tick = 0
 	world.loop_number = 0
 	world.simulation_time = 0
-	world.game_state = .Looping
 	world.first_loop_started = false
 	clear(&input_streams)
 	start_new_loop()
