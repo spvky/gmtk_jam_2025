@@ -15,6 +15,12 @@ Upgrade :: struct {
 	price:       int,
 	draw_coords: rl.Rectangle,
 	pos:         Vec2,
+	state:       Upgrade_State,
+}
+
+Upgrade_State :: enum {
+	Idle,
+	Hover,
 }
 
 Upgrade_Type :: enum {
@@ -25,7 +31,7 @@ init_upgrades :: proc() {
 
 	upgrade_sheet = rl.LoadTexture("assets/sprites/spreadshot.png")
 
-	append(&upgrade_choices, Upgrade{.Spread, 3, {0, 0, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}})
+	append(&upgrade_choices, Upgrade{.Spread, 3, {0, 0, UPGRADE_SIZE, UPGRADE_SIZE}, {0, 0}, .Idle})
 
 }
 
@@ -86,4 +92,42 @@ draw_upgrades :: proc() {
 
 	}
 
+}
+
+apply_upgrade :: proc(type: Upgrade_Type) {
+	switch type {
+	case .Spread:
+		world.player.shot_amount = 4
+		world.player.shot_spread = 30.
+	}
+}
+
+update_upgrades :: proc() {
+
+	input := world.current_input_tick
+	for &upgrade in upgrades {
+
+		idle_texture := upgrade_choices[upgrade.type].draw_coords
+		hover_texture := idle_texture
+		hover_texture.x += UPGRADE_SIZE
+
+		if rl.CheckCollisionCircles(
+			get_relative_position(upgrade.pos),
+			16,
+			get_relative_position(world.player.translation),
+			8,
+		) {
+			upgrade.state = .Hover
+		} else {upgrade.state = .Idle}
+
+		switch upgrade.state {
+		case .Idle:
+			upgrade.draw_coords = idle_texture
+		case .Hover:
+			upgrade.draw_coords = hover_texture
+			if .Interact in input.buttons {
+				apply_upgrade(upgrade.type)
+			}
+		}
+	}
 }

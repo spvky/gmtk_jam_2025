@@ -170,6 +170,7 @@ playing :: proc() {
 
 		if world.current_level == .Hub {
 
+			update_upgrades()
 			world.current_tick = 0
 		}
 
