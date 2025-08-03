@@ -18,7 +18,7 @@ Enemy :: struct {
 }
 
 ENEMY_DAMAGE_TIME :: 0.3
-SKELETON_ATTACK_RANGE_RADIUS_PX :: 16
+SKELETON_ATTACK_RANGE_RADIUS_PX :: 10
 VAMPIRE_ATTACK_RANGE_RADIUS_PX :: 120
 
 MARCHING_STEPS :: 20
@@ -201,6 +201,12 @@ animate_enemy :: proc(enemy: ^Enemy) {
 enemy_attack :: proc(enemy: ^Enemy) {
 	switch enemy.tag {
 	case .Skeleton:
+		target_position := world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE)}
+		if l.distance(enemy.position, target_position) < 20 {
+			if world.player.health > 0 {
+				world.player.health -= 1
+			}
+		}
 	case .Vampire:
 		spawner := make_circle_spawner(.Enemy, enemy.position, 4, 2, 5, 0.15, 45, 100)
 		append(&bullet_spawners, spawner)
@@ -209,6 +215,10 @@ enemy_attack :: proc(enemy: ^Enemy) {
 
 draw_enemies :: proc() {
 	for enemy in enemies {
+		facing: f32 = 1
+		if world.player.translation.x < enemy.position.x {
+			facing = -1
+		}
 		relative_position := get_relative_position(enemy.position)
 		current_frame := enemy.animation_player.current_frame
 		x_position := f32(current_frame % 9) * 32
@@ -216,7 +226,7 @@ draw_enemies :: proc() {
 		source_rect := rl.Rectangle {
 			x      = x_position,
 			y      = y_position,
-			width  = 32,
+			width  = 32 * facing,
 			height = 32,
 		}
 		// debug
