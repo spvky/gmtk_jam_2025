@@ -37,29 +37,156 @@ Wave :: struct {
 Waves :: [8][TIME_LIMIT]Maybe(Wave)
 waves: Waves
 init_waves :: proc() {
-	//first;loop
-	waves[0][60] = Wave {
-		kind       = Wave_Area{100, {200, 120}},
-		amount     = 16,
-		enemy_type = .Skeleton,
+	// first loop
+	current_loop := 0
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 3,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 2,
+				enemy_type = .Vampire,
+			}
+		}
 	}
 
-	waves[0][120] = Wave {
-		kind       = Wave_Area{100, {200, 120}},
-		amount     = 5,
-		enemy_type = .Vampire,
+	// second loop
+	current_loop = 1
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 5,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 4,
+				enemy_type = .Vampire,
+			}
+		}
 	}
 
-	waves[0][160] = Wave {
-		kind = Wave_Line{start = {600, 120}, end = {700, 120}},
-		amount = 8,
-		enemy_type = .Vampire,
+	// third loop
+	current_loop = 2
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 8,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 5,
+				enemy_type = .Vampire,
+			}
+		}
 	}
 
-	waves[0][160] = Wave {
-		kind = Wave_Line{start = {300, 220}, end = {700, 220}},
-		amount = 10,
-		enemy_type = .Skeleton,
+	// fourth loop
+	current_loop = 3
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 10,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 6,
+				enemy_type = .Vampire,
+			}
+		}
+	}
+
+	// fifth loop
+	current_loop = 4
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 10,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 8,
+				enemy_type = .Vampire,
+			}
+		}
+	}
+
+	// sixth loop
+	current_loop = 5
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 10,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 8,
+				enemy_type = .Vampire,
+			}
+		}
+	}
+
+	// seventh loop
+	current_loop = 6
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 10,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 8,
+				enemy_type = .Vampire,
+			}
+		}
+	}
+
+	// eight loop
+	current_loop = 7
+	for i in 0 ..< TIME_LIMIT {
+		if i % 400 == 0 {
+			waves[current_loop][i] = Wave {
+				kind = Wave_Line{start = {300, 220}, end = {700, 220}},
+				amount = 10,
+				enemy_type = .Skeleton,
+			}
+		}
+		if i % 502 == 0 {
+			waves[current_loop][i] = Wave {
+				kind       = Wave_Area{100, {200, 120}},
+				amount     = 8,
+				enemy_type = .Vampire,
+			}
+		}
 	}
 }
 
