@@ -272,7 +272,12 @@ check_bullet_collision :: proc() {
 				   !has_collided &&
 				   enemy.health > 0 {
 					has_collided = true
-					enemy.health -= player_attributes[0].damage
+					damage_value := player_attributes[0].damage
+					if damage_value <= enemy.health {
+						enemy.health -= damage_value
+					} else {
+						enemy.health = 0
+					}
 					enemy.damaged_timer = ENEMY_DAMAGE_TIME
 					append(&to_remove, i)
 				}
