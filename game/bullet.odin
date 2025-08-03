@@ -268,16 +268,13 @@ check_bullet_collision :: proc() {
 		switch bullet.tag {
 		case .Player:
 			for &enemy in enemies {
-				if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, enemy.position, 8) && !has_collided {
+				if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, enemy.position, 8) &&
+				   !has_collided &&
+				   enemy.health > 0 {
 					has_collided = true
-					if enemy.health > 0 {
-						enemy.health -= 1
-
-					}
+					enemy.health -= 1
 					enemy.damaged_timer = ENEMY_DAMAGE_TIME
 					append(&to_remove, i)
-
-
 				}
 			}
 
