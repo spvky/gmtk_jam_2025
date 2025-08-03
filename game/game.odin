@@ -81,6 +81,8 @@ init :: proc() {
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
 	vignette_shader = rl.LoadShader(nil, "assets/shaders/vignette.glsl")
 
+	rl.HideCursor()
+
 	init_waves()
 	init_upgrades()
 }
@@ -142,7 +144,7 @@ playing :: proc() {
 	level: Level = world.levels[world.current_level]
 
 	relative_mouse_rotation := get_mouse_rotation(
-		get_relative_position(world.player.translation - {f32(TILE_SIZE), f32(TILE_SIZE)}),
+		get_relative_position(world.player.translation + {f32(TILE_SIZE), f32(TILE_SIZE)}),
 	)
 
 	input := world.current_input_tick
@@ -265,6 +267,19 @@ draw_ui :: proc() {
 		UI_POSITION_OFFSET_X,
 		UI_POSITION_OFFSET_Y + width,
 		10,
+		rl.WHITE,
+	)
+
+	// drawing crosshair
+	normalized_mouse_position := rl.GetMousePosition() / {f32(WINDOW_WIDTH), f32(WINDOW_HEIGHT)}
+	screen_space_mouse_position := normalized_mouse_position * {SCREEN_WIDTH, SCREEN_HEIGHT}
+
+	rl.DrawTexturePro(
+		ui_tilesheet,
+		{0, width, width, width},
+		{screen_space_mouse_position.x, screen_space_mouse_position.y, width, width},
+		{width / 2, width / 2},
+		0,
 		rl.WHITE,
 	)
 }
