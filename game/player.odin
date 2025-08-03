@@ -98,8 +98,8 @@ render_players :: proc() {
 player_shoot :: proc() {
 	player := &world.player
 	input := world.current_input_tick
-	translation := player.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
 	attributes := player_attributes[0]
+	translation := player.translation + Vec2{f32(TILE_SIZE), f32(TILE_SIZE + 4)}
 	if .Shoot in input.buttons {
 		spawner: BulletSpawner
 		switch attributes.shot_type {
