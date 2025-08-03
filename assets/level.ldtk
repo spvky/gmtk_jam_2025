@@ -707,7 +707,7 @@
 			"padding": 0,
 			"tags": [],
 			"tagsSourceEnumUid": 163,
-			"enumTags": [{ "enumValueId": "Collision", "tileIds": [0,1,2,3,4,5,10,15,20,25,30,35,40,41,42,43,44,45,50,51,52,53,54,55] }],
+			"enumTags": [{ "enumValueId": "Collision", "tileIds": [0,1,2,3,4,5,10,15,20,25,30,35,40,41,42,43,44,45,50,51,52,53,54,55,78] }],
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": {
