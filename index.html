@@ -71,6 +71,9 @@
 					send_resize();
 				}, true);
 
+				window.addEventListener('fullscreenchange', function(event) {
+					send_resize();
+				}, true);
 				// This can probably be done better: Ideally we'd feed the
 				// initial size to `main_start`. But there seems to be a
 				// race condition. `canvas` doesn't have it's correct size yet.
