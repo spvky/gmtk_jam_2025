@@ -25,7 +25,7 @@ make_ghost :: proc(translation: Vec2) -> Ghost {
 }
 
 ghost_shoot :: proc(ghost: ^Ghost, input: InputTick, player: PlayerAttributes) {
-	translation := ghost.translation + Vec2{f32(TILE_SIZE) / 2, f32(TILE_SIZE) / 2}
+	translation := ghost.translation + Vec2{f32(TILE_SIZE), f32(TILE_SIZE + 4)}
 	spawner: BulletSpawner
 	switch player.shot_type {
 	case .Normal:
