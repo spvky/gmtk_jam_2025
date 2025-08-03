@@ -63,6 +63,31 @@ init_waves :: proc() {
 	}
 }
 
+
+level_collision :: proc(position: Vec2) -> bool {
+	level := world.levels[world.current_level]
+	for tile in level.tiles {
+		if !(.Collision in tile.properties) {continue}
+
+		enemy_collision_rect: rl.Rectangle = {
+			x      = position.x,
+			y      = position.y,
+			width  = 16,
+			height = 16,
+		}
+
+		abs_tile_position := tile.position + level.position
+		if rl.CheckCollisionRecs(
+			enemy_collision_rect,
+			{abs_tile_position.x, abs_tile_position.y, TILE_SIZE, TILE_SIZE},
+		) {
+			return true
+		}
+	}
+
+	return false
+}
+
 spawn_wave :: proc(wave: Wave, level: Level) {
 	amount := wave.amount
 	switch kind in wave.kind {
@@ -70,23 +95,26 @@ spawn_wave :: proc(wave: Wave, level: Level) {
 		for i in 0 ..< amount {
 			angle := f32(i) / f32(amount) * (math.PI * 2)
 			offset: Vec2 = {math.cos(angle), math.sin(angle)} * kind.radius
-			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset + level.position))
+			spawn_position := kind.location + offset + level.position
+			if !level_collision(spawn_position) {
+				append(&enemies, make_enemy(wave.enemy_type, spawn_position))
+			}
 		}
 	case Wave_Circle:
 		for i in 0 ..< amount {
 			angle := f32(i) / f32(amount) * (math.PI * 2)
 			offset: Vec2 = {math.cos(angle), math.sin(angle)} * kind.radius
-			append(&enemies, make_enemy(wave.enemy_type, kind.location + offset + level.position))
+			spawn_position := kind.location + offset + level.position
+			if !level_collision(spawn_position) {
+				append(&enemies, make_enemy(wave.enemy_type, spawn_position))
+			}
 		}
 	case Wave_Line:
 		for i in 0 ..< amount {
-			append(
-				&enemies,
-				make_enemy(
-					wave.enemy_type,
-					kind.start + (kind.end - kind.start) * (f32(i) / f32(amount)) + level.position,
-				),
-			)
+			spawn_position := kind.start + (kind.end - kind.start) * (f32(i) / f32(amount)) + level.position
+			if !level_collision(spawn_position) {
+				append(&enemies, make_enemy(wave.enemy_type, spawn_position))
+			}
 		}
 	case rl.Rectangle:
 	// TODO
