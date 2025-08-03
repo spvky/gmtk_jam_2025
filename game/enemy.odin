@@ -121,7 +121,7 @@ should_enemy_be_attacking :: proc(enemy: Enemy) -> bool {
 }
 
 update_enemies :: proc(flow_field: [][]rl.Vector2) {
-	for &enemy in enemies {
+	for &enemy, i in enemies {
 		if enemy.damaged_timer > 0 {
 			enemy.damaged_timer = math.clamp(enemy.damaged_timer - TICK_RATE, 0, ENEMY_DAMAGE_TIME)
 		}
@@ -170,6 +170,9 @@ update_enemies :: proc(flow_field: [][]rl.Vector2) {
 				enemy.state = .Movement
 			}
 		case .Die:
+			if enemy.animation_player.current_frame == enemy.animation_player.current_animation.end {
+				unordered_remove(&enemies, i)
+			}
 		}
 	}
 }
