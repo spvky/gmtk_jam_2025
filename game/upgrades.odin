@@ -33,6 +33,12 @@ Upgrade_Type :: enum {
 	Spiral,
 }
 
+Upgrade_Info :: [3]cstring {
+	"Shoot an arc of projectiles forwards",
+	"Shoot a spinning ring of projectiles",
+	"Emit a circle of projectiles around you",
+}
+
 init_upgrades :: proc() {
 
 	upgrade_sheet = rl.LoadTexture("assets/sprites/spreadshot.png")
@@ -98,10 +104,24 @@ make_upgrades :: proc() {
 }
 
 draw_upgrades :: proc() {
-
+	upgrade_info := Upgrade_Info
 	for upgrade in upgrades {
 
 		rl.DrawTextureRec(upgrade_sheet, upgrade.draw_coords, get_relative_position(upgrade.pos), rl.WHITE)
+
+		if upgrade.state == .Hover {
+
+			relative_pos := get_relative_position(upgrade.pos)
+
+			rl.DrawText(rl.TextFormat("[E]"), i32(relative_pos.x), i32(relative_pos.y - 10), 5, rl.WHITE)
+			rl.DrawText(
+				upgrade_info[upgrade.type],
+				i32(relative_pos.x),
+				i32(relative_pos.y + UPGRADE_SIZE + 10),
+				5,
+				rl.WHITE,
+			)
+		}
 
 	}
 
