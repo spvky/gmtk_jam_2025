@@ -218,10 +218,6 @@ playing :: proc() {
 		physics_step()
 		world.current_tick += 1
 		world.simulation_time -= TICK_RATE
-		if rl.IsKeyPressed(.END) {
-			player_wins_wave()
-		}
-
 
 		if world.current_level == .Hub {
 			update_upgrades()
