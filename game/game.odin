@@ -252,7 +252,7 @@ draw_ui :: proc() {
 	for i in 0 ..< PLAYER_HEALTH {
 		rl.DrawTextureRec(
 			ui_tilesheet,
-			{0, 0, width, width} if int(world.player.health) >= i else {width, 0, width, width},
+			{0, 0, width, width} if int(world.player.health) > i else {width, 0, width, width},
 			{f32(UI_POSITION_OFFSET_X + i * width), UI_POSITION_OFFSET_Y},
 			rl.WHITE,
 		)
