@@ -18,8 +18,8 @@ player_attributes: [dynamic]PlayerAttributes
 TICK_RATE :: 1.0 / 100.0
 WINDOW_WIDTH: i32
 WINDOW_HEIGHT: i32
-SCREEN_WIDTH :: 800
-SCREEN_HEIGHT :: 450
+SCREEN_WIDTH :: 500
+SCREEN_HEIGHT :: 360
 TIME_LIMIT :: 10000
 run := true
 
