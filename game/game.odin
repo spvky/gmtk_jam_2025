@@ -76,6 +76,7 @@ init :: proc() {
 	ghost_shader = rl.LoadShader(nil, "assets/shaders/ghost.glsl")
 
 	init_waves()
+	init_upgrades()
 }
 
 spawn_player_and_ghosts :: proc() {
@@ -112,6 +113,7 @@ draw :: proc() {
 	draw_bullets()
 	draw_ghosts()
 	display_clock()
+	make_upgrades()
 	rl.EndTextureMode()
 
 

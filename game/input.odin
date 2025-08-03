@@ -10,6 +10,7 @@ InputStream :: [TIME_LIMIT]InputTick
 Button :: enum u8 {
 	Shoot,
 	Roll,
+	Interact,
 }
 
 InputTick :: struct {
@@ -120,6 +121,9 @@ read_input :: proc(mouse_rotation: f32) {
 	}
 	if rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT) {
 		buttons = buttons | {.Roll}
+	}
+	if rl.IsKeyDown(.E) {
+		buttons = buttons | {.Interact}
 	}
 
 	world.current_input_tick = InputTick {

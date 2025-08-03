@@ -47,6 +47,7 @@ Entity :: struct {
 Entity_Type :: enum {
 	Player_Spawn,
 	Next_Level,
+	Upgrade_Spawn,
 }
 
 Layer_Type :: enum {
@@ -160,7 +161,11 @@ add_entity :: proc(entities: ^[dynamic]Entity, entity_instance: ldtk.Entity_Inst
 
 	case "Next_Level":
 		entity.type = .Next_Level
+
+	case "Upgrade_Spawn":
+		entity.type = .Upgrade_Spawn
 	}
+
 
 	append(entities, entity)
 }
