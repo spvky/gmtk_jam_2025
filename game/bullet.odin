@@ -298,8 +298,8 @@ check_bullet_collision :: proc() {
 		level := world.levels[world.current_level]
 		for tile in level.tiles {
 			if .Collision in tile.properties {
-
-				tile_rec := rl.Rectangle{tile.position[0], tile.position[1], TILE_SIZE, TILE_SIZE}
+				tile_position := tile.position + level.position
+				tile_rec := rl.Rectangle{tile_position.x, tile_position.y, TILE_SIZE, TILE_SIZE}
 				if rl.CheckCollisionCircleRec(bullet.position, BULLET_RADIUS, tile_rec) {
 					has_collided = true
 					append(&to_remove, i)
