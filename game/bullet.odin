@@ -304,7 +304,10 @@ check_bullet_collision :: proc() {
 		case .Ghost:
 			if rl.CheckCollisionCircles(bullet.position, BULLET_RADIUS, world.player.translation, 8) {
 				has_collided = true
-				kill_player()
+				if world.player.health > 0 {
+					world.player.health = 0
+
+				}
 				append(&to_remove, i)
 			}
 		}
